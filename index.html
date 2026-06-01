@@ -593,12 +593,12 @@
         // --- Authentication Logic ---
         function login(username, password) {
             // Simulated Backend Check
-            if (username === 'deshan' && password === '20051230') {
+            if (username === 'admin' && password === 'password123') {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
                 // UI Updates
-                els.adminLoginBtn.style.display = 'none';
+                els.adminLoginBtn.style.display = 'admin only';
                 els.adminControls.style.display = 'flex';
                 els.pdfAdminControls.style.display = 'block';
                 els.adminCols.forEach(col => col.style.display = 'table-cell');
