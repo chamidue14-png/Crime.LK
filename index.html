@@ -598,14 +598,7 @@
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
                 // UI Updates
-                <a href="admin.html" id="adminBtn" style="display: none;">Admin Panel</a>
-
-<script>
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('secret') === 'crimelk2026') {
-    document.getElementById('adminBtn').style.display = 'inline-block';
-  }
-</script>
+                els.adminLoginBtn.style.display = 'none';
                 els.adminControls.style.display = 'flex';
                 els.pdfAdminControls.style.display = 'block';
                 els.adminCols.forEach(col => col.style.display = 'table-cell');
