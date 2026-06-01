@@ -598,7 +598,8 @@
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
                 // UI Updates
-                
+                els.adminLoginBtn.style.display = 'none';
+                els.adminControls.style.display = 'flex';
                 els.pdfAdminControls.style.display = 'block';
                 els.adminCols.forEach(col => col.style.display = 'table-cell');
                 
