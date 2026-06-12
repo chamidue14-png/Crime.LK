@@ -253,8 +253,8 @@
         </ul>
         
         <div style="display: flex; gap: 1rem; align-items: center;">
-            <!-- Public Admin Button -->
-            <button id="btn-admin-login" class="btn">Admin</button>
+            <!-- Hidden Admin Button (Invisible to normal users) -->
+            <button id="btn-admin-login" class="btn" style="display: none;">Admin</button>
             
             <!-- Admin Controls (Hidden until login) -->
             <div id="admin-controls" class="admin-controls">
@@ -437,8 +437,8 @@
             <h2 style="margin-bottom: 1.5rem; color: var(--white); text-align: center;">Secure Admin Login</h2>
             <form id="login-form">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" required placeholder="Enter admin username">
+                    <label>Username / Email</label>
+                    <input type="text" id="username" required placeholder="Enter admin username or email">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -446,7 +446,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Authenticate</button>
                 <p style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim); text-align: center;">
-                    Protected by simulated JWT & bcrypt hashing.
+                    Protected System. Authorized Personnel Only.
                 </p>
             </form>
         </div>
@@ -592,8 +592,9 @@
 
         // --- Authentication Logic ---
         function login(username, password) {
-            // Simulated Backend Check
-            if (username === 'admin' && password === 'password123') {
+            // මෙතනින් උඹේ ඊමේල් ලිපින 2 විතරක් චෙක් කරනවා
+            const lowerUser = username.trim().toLowerCase();
+            if ((lowerUser === 'chamiduerangadeshan@gmail.com' || lowerUser === 'chamiduerangae14@gmail.com') && password === 'password123') {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
@@ -616,7 +617,7 @@
             state.isAuthenticated = false;
             state.user = null;
             
-            els.adminLoginBtn.style.display = 'inline-block';
+            els.adminLoginBtn.style.display = 'none'; // ලොග් අවුට් වුනාමත් ආයෙත් බටන් එක හංගනවා
             els.adminControls.style.display = 'none';
             els.pdfAdminControls.style.display = 'none';
             els.adminCols.forEach(col => col.style.display = 'none');
@@ -672,7 +673,7 @@
             if (!confirm('Are you sure you want to delete this record?')) return;
             state.crimeData = state.crimeData.filter(c => c.id !== id);
             renderTable(state.crimeData);
-            updateCharts(); // Refresh charts
+            updateCharts(); 
             showToast('Record deleted');
         };
 
@@ -703,7 +704,14 @@
 
         // --- Event Listeners ---
         function setupEventListeners() {
-            // Modals
+            // Secret Shortcut Key Listener: Ctrl + Shift + A ඔබපු ගමන් ලොගින් බොක්ස් එක එනවා
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+                    e.preventDefault();
+                    openModal('login-modal');
+                }
+            });
+
             els.adminLoginBtn.addEventListener('click', () => openModal('login-modal'));
             els.dashboardBtn.addEventListener('click', () => openModal('dashboard-modal'));
             els.logoutBtn.addEventListener('click', logout);
@@ -721,7 +729,7 @@
                     id: 100 + state.crimeData.length + 1,
                     date: document.getElementById('new-date').value,
                     province: document.getElementById('new-province').value,
-                    district: 'Unknown', // Simplified for demo
+                    district: 'Unknown', 
                     category: document.getElementById('new-category').value,
                     description: document.getElementById('new-desc').value,
                     status: 'Pending'
@@ -746,7 +754,7 @@
                 state.reports.push({
                     id: Date.now(),
                     title: title,
-                    size: '1.2 MB', // Mock size
+                    size: '1.2 MB', 
                     date: new Date().toISOString().split('T')[0]
                 });
                 renderPDFs();
@@ -845,7 +853,6 @@
         }
 
         function updateCharts() {
-            // Simple logic to update charts slightly based on data count to simulate interactivity
             const count = state.crimeData.length;
             charts.bar.data.datasets[0].data = [count + 20, count * 0.8, count * 0.5, count * 0.7, count * 0.4];
             charts.bar.update();
@@ -905,7 +912,7 @@
                     let size = (Math.random() * 2) + 1;
                     let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
                     let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                    let directionX = (Math.random() * 2) - 1; // Speed
+                    let directionX = (Math.random() * 2) - 1; 
                     let directionY = (Math.random() * 2) - 1;
                     let color = '#64ffda';
                     particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
