@@ -12,9 +12,9 @@
 
     <style>
         :root {
-            --primary: #0a192f; /* Deep Navy */
-            --secondary: #112240; /* Royal Blue/Dark */
-            --accent: #64ffda; /* Cyan */
+            --primary: #0a192f;
+            --secondary: #112240;
+            --accent: #64ffda;
             --text-light: #ccd6f6;
             --text-dim: #8892b0;
             --white: #e6f1ff;
@@ -437,8 +437,8 @@
             <h2 style="margin-bottom: 1.5rem; color: var(--white); text-align: center;">Secure Admin Login</h2>
             <form id="login-form">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="username" required placeholder="Enter admin username">
+                    <label>Username (Email)</label>
+                    <input type="text" id="username" required placeholder="Enter admin email">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -592,8 +592,13 @@
 
         // --- Authentication Logic ---
         function login(username, password) {
-            // Simulated Backend Check
-            if (username === 'chamiduerangadeshan@gmail.com' || username === 'chamidue14@gmail.com') {
+            // Updated Backend Check to ensure only specific email/account combinations can access admin
+            const allowedUsers = {
+                'chamiduerangadeshan@gmail.com': 'password123',
+                'chamidue14@gmail.com': 'password123'
+            };
+
+            if (allowedUsers[username] && allowedUsers[username] === password) {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
@@ -689,7 +694,6 @@
             const province = document.getElementById('filter-province').value;
             const category = document.getElementById('filter-category').value;
             const year = document.getElementById('filter-year').value;
-
             const filtered = state.crimeData.filter(item => {
                 const matchSearch = item.description.toLowerCase().includes(search) || item.district.toLowerCase().includes(search);
                 const matchProv = province === 'all' || item.province === province;
@@ -697,7 +701,6 @@
                 const matchYear = year === 'all' || item.date.startsWith(year);
                 return matchSearch && matchProv && matchCat && matchYear;
             });
-
             renderTable(filtered);
         }
 
@@ -774,7 +777,6 @@
 
         // --- Chart.js Logic ---
         let charts = {};
-
         function initCharts() {
             // Line Chart
             const ctx1 = document.getElementById('lineChart').getContext('2d');
@@ -845,11 +847,9 @@
         }
 
         function updateCharts() {
-            // Simple logic to update charts slightly based on data count to simulate interactivity
             const count = state.crimeData.length;
             charts.bar.data.datasets[0].data = [count + 20, count * 0.8, count * 0.5, count * 0.7, count * 0.4];
             charts.bar.update();
-            
             charts.line.data.datasets[0].data = [count+10, count+5, count+12, count+8, count+2, count];
             charts.line.update();
         }
@@ -863,7 +863,6 @@
 
             let particlesArray;
             let mouse = { x: null, y: null, radius: 150 };
-
             window.addEventListener('mousemove', (event) => {
                 mouse.x = event.x;
                 mouse.y = event.y;
@@ -871,7 +870,8 @@
 
             class Particle {
                 constructor(x, y, directionX, directionY, size, color) {
-                    this.x = x; this.y = y; this.directionX = directionX; this.directionY = directionY;
+                    this.x = x;
+                    this.y = y; this.directionX = directionX; this.directionY = directionY;
                     this.size = size; this.color = color;
                 }
                 draw() {
@@ -893,7 +893,8 @@
                         if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 10;
                         if (mouse.y > this.y && this.y > this.size * 10) this.y -= 10;
                     }
-                    this.x += this.directionX; this.y += this.directionY;
+                    this.x += this.directionX;
+                    this.y += this.directionY;
                     this.draw();
                 }
             }
@@ -905,7 +906,7 @@
                     let size = (Math.random() * 2) + 1;
                     let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
                     let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                    let directionX = (Math.random() * 2) - 1; // Speed
+                    let directionX = (Math.random() * 2) - 1;
                     let directionY = (Math.random() * 2) - 1;
                     let color = '#64ffda';
                     particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
@@ -945,7 +946,6 @@
                 canvas.height = innerHeight;
                 init();
             });
-
             init();
             animate();
         }
