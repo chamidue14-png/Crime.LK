@@ -569,8 +569,8 @@
 
         // --- Authentication Logic ---
         function login(username, password) {
-            // Simulated Backend Check modified for exclusive access
-            if ((username === 'chamiduerangadeshan' || username === 'chamiduerangadeshan') && password === '20051230') {
+            // Checked and Restricted for requested emails exclusively
+            if ((username === 'chamiduerangadeshan@gmail.com' || username === 'chamidue14@gmail.com') && password === 'password123') {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
