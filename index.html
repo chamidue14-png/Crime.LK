@@ -593,10 +593,7 @@
         // --- Authentication Logic ---
         function login(username, password) {
             // Simulated Backend Check
-            if (
-                username === 'chamiduerangadeshan@gmail.com' ||
-                username === 'chamidue14@gmail.com'
-            ) {
+            if ((username === 'chamiduerangadeshan@gmail.com' || username === 'chamidue14@gmail.com') && password === 'password123') {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
