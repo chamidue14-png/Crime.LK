@@ -569,7 +569,7 @@
 
         // --- Authentication Logic ---
         function login(username, password) {
-            // Checked and Restricted for requested emails exclusively
+            // Updated verification criteria specifically for requested accounts
             if ((username === 'chamiduerangadeshan@gmail.com' || username === 'chamidue14@gmail.com') && password === 'password123') {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
@@ -666,6 +666,7 @@
             const province = document.getElementById('filter-province').value;
             const category = document.getElementById('filter-category').value;
             const year = document.getElementById('filter-year').value;
+
             const filtered = state.crimeData.filter(item => {
                 const matchSearch = item.description.toLowerCase().includes(search) || item.district.toLowerCase().includes(search);
                 const matchProv = province === 'all' || item.province === province;
@@ -673,6 +674,7 @@
                 const matchYear = year === 'all' || item.date.startsWith(year);
                 return matchSearch && matchProv && matchCat && matchYear;
             });
+
             renderTable(filtered);
         }
 
@@ -749,6 +751,7 @@
 
         // --- Chart.js Logic ---
         let charts = {};
+
         function initCharts() {
             // Line Chart
             const ctx1 = document.getElementById('lineChart').getContext('2d');
@@ -822,6 +825,7 @@
             const count = state.crimeData.length;
             charts.bar.data.datasets[0].data = [count + 20, count * 0.8, count * 0.5, count * 0.7, count * 0.4];
             charts.bar.update();
+            
             charts.line.data.datasets[0].data = [count+10, count+5, count+12, count+8, count+2, count];
             charts.line.update();
         }
@@ -835,6 +839,7 @@
 
             let particlesArray;
             let mouse = { x: null, y: null, radius: 150 };
+
             window.addEventListener('mousemove', (event) => {
                 mouse.x = event.x;
                 mouse.y = event.y;
@@ -842,8 +847,7 @@
 
             class Particle {
                 constructor(x, y, directionX, directionY, size, color) {
-                    this.x = x;
-                    this.y = y; this.directionX = directionX; this.directionY = directionY;
+                    this.x = x; this.y = y; this.directionX = directionX; this.directionY = directionY;
                     this.size = size; this.color = color;
                 }
                 draw() {
@@ -865,8 +869,7 @@
                         if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 10;
                         if (mouse.y > this.y && this.y > this.size * 10) this.y -= 10;
                     }
-                    this.x += this.directionX;
-                    this.y += this.directionY;
+                    this.x += this.directionX; this.y += this.directionY;
                     this.draw();
                 }
             }
@@ -878,7 +881,7 @@
                     let size = (Math.random() * 2) + 1;
                     let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
                     let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                    let directionX = (Math.random() * 2) - 1;
+                    let directionX = (Math.random() * 2) - 1; 
                     let directionY = (Math.random() * 2) - 1;
                     let color = '#64ffda';
                     particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
@@ -918,6 +921,7 @@
                 canvas.height = innerHeight;
                 init();
             });
+
             init();
             animate();
         }
