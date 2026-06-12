@@ -5,16 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEW Crime.LK - Sri Lanka Crime Research Platform</title>
     
-    <!-- External Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --primary: #0a192f;
-            --secondary: #112240;
-            --accent: #64ffda;
+            --primary: #0a192f; /* Deep Navy */
+            --secondary: #112240; /* Royal Blue/Dark */
+            --accent: #64ffda; /* Cyan */
             --text-light: #ccd6f6;
             --text-dim: #8892b0;
             --white: #e6f1ff;
@@ -238,10 +237,8 @@
 </head>
 <body>
 
-    <!-- Canvas Background -->
     <div id="canvas-container"><canvas id="particleCanvas"></canvas></div>
 
-    <!-- Navigation -->
     <nav>
         <div class="logo">Crime.LK <span style="color:var(--text-dim); font-size:0.8rem; margin-left:5px;">RESEARCH</span></div>
         <ul class="nav-links">
@@ -253,10 +250,8 @@
         </ul>
         
         <div style="display: flex; gap: 1rem; align-items: center;">
-            <!-- Public Admin Button -->
             <button id="btn-admin-login" class="btn">Admin</button>
             
-            <!-- Admin Controls (Hidden until login) -->
             <div id="admin-controls" class="admin-controls">
                 <span style="color: var(--accent); font-size: 0.9rem;">Owner <span class="admin-badge">PRO</span></span>
                 <button id="btn-dashboard" class="btn btn-primary">Dashboard</button>
@@ -265,7 +260,6 @@
         </div>
     </nav>
 
-    <!-- Home Section -->
     <section id="home">
         <div class="container">
             <h1 class="hero-title">Crime Data Intelligence<br>for Sri Lanka</h1>
@@ -277,7 +271,6 @@
         </div>
     </section>
 
-    <!-- Statistics Overview Cards -->
     <div class="container">
         <div class="stats-grid">
             <div class="stat-card">
@@ -303,7 +296,6 @@
         </div>
     </div>
 
-    <!-- Crime Data Explorer -->
     <section id="explorer">
         <div class="container">
             <h2 style="margin-bottom: 2rem; color: var(--white);">Crime Data Explorer</h2>
@@ -347,14 +339,13 @@
                                 <th class="admin-only-col" style="display:none;">Action</th>
                             </tr>
                         </thead>
-                        <tbody><!-- Data injected via JS --></tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Statistics Dashboard -->
     <section id="stats">
         <div class="container">
             <h2 style="margin-bottom: 2rem; color: var(--white);">Analytics & Trends</h2>
@@ -379,7 +370,6 @@
         </div>
     </section>
 
-    <!-- Reports & PDF Repository -->
     <section id="reports">
         <div class="container">
             <h2 style="margin-bottom: 2rem; color: var(--white);">Research Repository</h2>
@@ -388,13 +378,11 @@
                     <button class="btn btn-primary" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Report</button>
                 </div>
                 <ul class="pdf-list" id="pdf-container">
-                    <!-- PDFs injected here -->
-                </ul>
+                    </ul>
             </div>
         </div>
     </section>
 
-    <!-- Research Hub -->
     <section id="research">
         <div class="container">
             <h2 style="margin-bottom: 2rem; color: var(--white);">Research Hubs</h2>
@@ -423,22 +411,18 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer style="background: #020c1b; padding: 2rem; text-align: center; color: var(--text-dim); border-top: var(--border);">
         <p>&copy; 2023 NEW Crime.LK. National Crime Research Platform. All Rights Reserved.</p>
     </footer>
 
-    <!-- MODALS -->
-
-    <!-- Admin Login Modal -->
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('login-modal')">&times;</span>
             <h2 style="margin-bottom: 1.5rem; color: var(--white); text-align: center;">Secure Admin Login</h2>
             <form id="login-form">
                 <div class="form-group">
-                    <label>Username (Email)</label>
-                    <input type="text" id="username" required placeholder="Enter admin email">
+                    <label>Username</label>
+                    <input type="text" id="username" required placeholder="Enter admin username">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -452,20 +436,17 @@
         </div>
     </div>
 
-    <!-- Dashboard Modal (Tabs) -->
     <div class="modal" id="dashboard-modal">
         <div class="modal-content" style="max-width: 800px;">
             <span class="close-modal" onclick="closeModal('dashboard-modal')">&times;</span>
             <h2 style="color: var(--white); margin-bottom: 1rem;">Admin Dashboard</h2>
             
-            <!-- Dashboard Tabs -->
             <div style="display: flex; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem;">
                 <button class="btn" onclick="switchTab('tab-data')" style="border:none; color:var(--accent);">Data Mgmt</button>
                 <button class="btn" onclick="switchTab('tab-security')" style="border:none; color:var(--text-dim);">Security Center</button>
                 <button class="btn" onclick="switchTab('tab-settings')" style="border:none; color:var(--text-dim);">Settings</button>
             </div>
 
-            <!-- Tab: Data Management -->
             <div id="tab-data" class="tab-content">
                 <h3 style="color: var(--accent); margin-bottom: 1rem;">Add New Crime Record</h3>
                 <form id="add-crime-form">
@@ -493,7 +474,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Security Center -->
             <div id="tab-security" class="tab-content" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 1rem;">Security Center</h3>
                 <div class="glass-panel" style="padding: 1rem; font-size: 0.9rem;">
@@ -508,7 +488,6 @@
                 </div>
             </div>
 
-            <!-- Tab: Settings -->
             <div id="tab-settings" class="tab-content" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 1rem;">System Settings</h3>
                 <p>Backup Database</p>
@@ -520,7 +499,6 @@
         </div>
     </div>
 
-    <!-- Upload PDF Modal -->
     <div class="modal" id="upload-modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('upload-modal')">&times;</span>
@@ -539,7 +517,6 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast">Operation Successful</div>
 
     <script>
@@ -592,13 +569,8 @@
 
         // --- Authentication Logic ---
         function login(username, password) {
-            // Updated Backend Check to ensure only specific email/account combinations can access admin
-            const allowedUsers = {
-                'chamiduerangadeshan@gmail.com': 'password123',
-                'chamidue14@gmail.com': 'password123'
-            };
-
-            if (allowedUsers[username] && allowedUsers[username] === password) {
+            // Simulated Backend Check modified for exclusive access
+            if ((username === 'chamiduerangadeshan@gmail.com' || username === 'chamidue14@gmail.com') && password === 'password123') {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
