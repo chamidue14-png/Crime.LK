@@ -593,7 +593,10 @@
         // --- Authentication Logic ---
         function login(username, password) {
             // Simulated Backend Check
-            if (username === 'chamiduerangadeshan' && password === '20051230') {
+            if (
+                username === 'chamiduerangadeshan@gmail.com' ||
+                username === 'chamidue14@gmail.com'
+            ) {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 
@@ -706,7 +709,7 @@
             // Modals
             els.adminLoginBtn.addEventListener('click', () => openModal('login-modal'));
             els.dashboardBtn.addEventListener('click', () => openModal('dashboard-modal'));
-            https://chamidue14-png.github.io/Crime.LK/
+            els.logoutBtn.addEventListener('click', logout);
             
             // Login
             els.loginForm.addEventListener('submit', (e) => {
