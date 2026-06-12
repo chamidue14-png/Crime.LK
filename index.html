@@ -947,3 +947,21 @@
     </script>
 </body>
 </html>
+// 1. Get the current user's email (Replace this with however you get the logged-in user)
+const currentUserEmail = "user@example.com"; // This should come from your auth state
+
+// 2. Define the authorized list
+const authorizedEmails = [
+    'chamiduerangadeshan@gmail.com',
+    'chamidue14@gmail.com'
+];
+
+// 3. Select the button element (Ensure your button has an ID, e.g., id="adminLoginBtn")
+const adminButton = document.getElementById('adminLoginBtn');
+
+// 4. Check visibility logic
+if (authorizedEmails.includes(currentUserEmail)) {
+    adminButton.style.display = 'block'; // or 'flex', 'inline-block', etc.
+} else {
+    adminButton.style.display = 'none'; // Hide the button for anyone else
+}
