@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEW Crime.LK - Sri Lanka Crime Research Platform</title>
     
-    <!-- External Libraries -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -35,9 +34,8 @@
 
         /* --- Animations --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 5px var(--accent); } 50% { box-shadow: 0 0 20px var(--accent); } 100% { box-shadow: 0 0 5px var(--accent); } }
 
-        /* --- Particle Background --- */
+        /* --- Background Canvas --- */
         #canvas-container {
             position: fixed;
             top: 0;
@@ -97,9 +95,9 @@
         .btn-danger { border-color: var(--danger); color: var(--danger); }
         .btn-danger:hover { background: rgba(255, 95, 95, 0.1); }
         
-        /* --- Admin Specific Styles --- */
+        /* --- Admin Controls --- */
         .admin-controls {
-            display: none; /* Hidden by default */
+            display: none;
             gap: 1rem;
             align-items: center;
         }
@@ -212,6 +210,38 @@
         .form-group label { display: block; margin-bottom: 0.5rem; color: var(--accent); font-size: 0.9rem; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; }
 
+        /* Security Tab Specific Layout */
+        .security-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: var(--border);
+            border-radius: 6px;
+            padding: 1.2rem;
+            margin-bottom: 1rem;
+        }
+        .security-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .security-item:last-child { border-bottom: none; }
+        .security-item span strong { color: var(--white); }
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .password-wrapper input { padding-right: 2.5rem; }
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            cursor: pointer;
+            color: var(--text-dim);
+        }
+        .toggle-password:hover { color: var(--accent); }
+
         /* Toast Notification */
         #toast {
             position: fixed;
@@ -228,9 +258,8 @@
         }
         #toast.show { transform: translateY(0); }
 
-        /* Mobile Responsive */
         @media (max-width: 768px) {
-            .nav-links { display: none; } /* Simplified mobile nav for demo */
+            .nav-links { display: none; }
             .hero-title { font-size: 2.5rem; }
             .charts-grid { grid-template-columns: 1fr; }
         }
@@ -238,10 +267,8 @@
 </head>
 <body>
 
-    <!-- Canvas Background -->
-    <div id="canvas-container"><canvas id="particleCanvas"></canvas></div>
+    <div id="canvas-container"><canvas id="interactiveCanvas"></canvas></div>
 
-    <!-- Navigation -->
     <nav>
         <div class="logo">Crime.LK <span style="color:var(--text-dim); font-size:0.8rem; margin-left:5px;">RESEARCH</span></div>
         <ul class="nav-links">
@@ -249,26 +276,21 @@
             <li><a href="#explorer">Data Explorer</a></li>
             <li><a href="#stats">Statistics</a></li>
             <li><a href="#reports">Reports</a></li>
-            <li><a href="#contact">Contact</a></li>
         </ul>
         
         <div style="display: flex; gap: 1rem; align-items: center;">
-            <!-- Hidden Admin Button (Invisible to normal users) -->
             <button id="btn-admin-login" class="btn" style="display: none;">Admin</button>
-            
-            <!-- Admin Controls (Hidden until login) -->
             <div id="admin-controls" class="admin-controls">
                 <span style="color: var(--accent); font-size: 0.9rem;">Owner <span class="admin-badge">PRO</span></span>
-                <button id="btn-dashboard" class="btn btn-primary">Dashboard</button>
+                <button id="btn-dashboard" class="btn btn-primary"><i class="fas fa-sliders-h"></i> Dashboard</button>
                 <button id="btn-logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i></button>
             </div>
         </div>
     </nav>
 
-    <!-- Home Section -->
     <section id="home">
         <div class="container">
-            <h1 class="hero-title">Crime Data Intelligence<br>for Sri Lanka</h1>
+            <h1 class="hero-title" id="main-hero-title">Crime Data Intelligence<br>for Sri Lanka</h1>
             <p class="hero-subtitle">Transforming crime statistics into meaningful research insights for policy makers, researchers, and academics.</p>
             <div style="display: flex; gap: 1rem;">
                 <a href="#explorer" class="btn btn-primary">Explore Data</a>
@@ -277,33 +299,16 @@
         </div>
     </section>
 
-    <!-- Statistics Overview Cards -->
     <div class="container">
         <div class="stats-grid">
-            <div class="stat-card">
-                <span class="stat-number" data-target="12543">0</span>
-                <span class="stat-label">Total Incidents</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" data-target="3420">0</span>
-                <span class="stat-label">Property Crimes</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" data-target="876">0</span>
-                <span class="stat-label">Cybercrime</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" data-target="2109">0</span>
-                <span class="stat-label">Drug Offences</span>
-            </div>
-            <div class="stat-card">
-                <span class="stat-number" data-target="98">0</span>
-                <span class="stat-label">Homicide</span>
-            </div>
+            <div class="stat-card"><span class="stat-number" id="stat-total" data-target="12543">0</span><span class="stat-label">Total Incidents</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-property" data-target="3420">0</span><span class="stat-label">Property Crimes</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-cyber" data-target="876">0</span><span class="stat-label">Cybercrime</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-drugs" data-target="2109">0</span><span class="stat-label">Drug Offences</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-homicide" data-target="98">0</span><span class="stat-label">Homicide</span></div>
         </div>
     </div>
 
-    <!-- Crime Data Explorer -->
     <section id="explorer">
         <div class="container">
             <h2 style="margin-bottom: 2rem; color: var(--white);">Crime Data Explorer</h2>
@@ -317,6 +322,10 @@
                         <option value="Northern">Northern</option>
                         <option value="Eastern">Eastern</option>
                         <option value="Southern">Southern</option>
+                        <option value="North Western">North Western</option>
+                        <option value="North Central">North Central</option>
+                        <option value="Uva">Uva</option>
+                        <option value="Sabaragamuwa">Sabaragamuwa</option>
                     </select>
                     <select id="filter-category">
                         <option value="all">All Categories</option>
@@ -328,6 +337,9 @@
                     </select>
                     <select id="filter-year">
                         <option value="all">All Years</option>
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
                         <option value="2023">2023</option>
                         <option value="2022">2022</option>
                         <option value="2021">2021</option>
@@ -347,39 +359,25 @@
                                 <th class="admin-only-col" style="display:none;">Action</th>
                             </tr>
                         </thead>
-                        <tbody><!-- Data injected via JS --></tbody>
+                        <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Statistics Dashboard -->
     <section id="stats">
         <div class="container">
             <h2 style="margin-bottom: 2rem; color: var(--white);">Analytics & Trends</h2>
             <div class="charts-grid">
-                <div class="glass-panel">
-                    <h3 style="margin-bottom: 1rem; color: var(--text-dim);">Annual Crime Trends</h3>
-                    <div class="chart-container"><canvas id="lineChart"></canvas></div>
-                </div>
-                <div class="glass-panel">
-                    <h3 style="margin-bottom: 1rem; color: var(--text-dim);">Provincial Distribution</h3>
-                    <div class="chart-container"><canvas id="barChart"></canvas></div>
-                </div>
-                <div class="glass-panel">
-                    <h3 style="margin-bottom: 1rem; color: var(--text-dim);">Category Breakdown</h3>
-                    <div class="chart-container"><canvas id="pieChart"></canvas></div>
-                </div>
-                <div class="glass-panel">
-                    <h3 style="margin-bottom: 1rem; color: var(--text-dim);">Case Resolution Rate</h3>
-                    <div class="chart-container"><canvas id="areaChart"></canvas></div>
-                </div>
+                <div class="glass-panel"><h3>Annual Crime Trends</h3><div class="chart-container"><canvas id="lineChart"></canvas></div></div>
+                <div class="glass-panel"><h3>Provincial Distribution</h3><div class="chart-container"><canvas id="barChart"></canvas></div></div>
+                <div class="glass-panel"><h3>Category Breakdown</h3><div class="chart-container"><canvas id="pieChart"></canvas></div></div>
+                <div class="glass-panel"><h3>Case Resolution Rate</h3><div class="chart-container"><canvas id="areaChart"></canvas></div></div>
             </div>
         </div>
     </section>
 
-    <!-- Reports & PDF Repository -->
     <section id="reports">
         <div class="container">
             <h2 style="margin-bottom: 2rem; color: var(--white);">Research Repository</h2>
@@ -387,178 +385,159 @@
                 <div id="pdf-admin-controls" style="display:none; margin-bottom: 1rem; text-align: right;">
                     <button class="btn btn-primary" onclick="openUploadModal()"><i class="fas fa-upload"></i> Upload Report</button>
                 </div>
-                <ul class="pdf-list" id="pdf-container">
-                    <!-- PDFs injected here -->
-                </ul>
+                <ul class="pdf-list" id="pdf-container"></ul>
             </div>
         </div>
     </section>
 
-    <!-- Research Hub -->
-    <section id="research">
-        <div class="container">
-            <h2 style="margin-bottom: 2rem; color: var(--white);">Research Hubs</h2>
-            <div class="charts-grid" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
-                <div class="glass-panel" style="text-align: center;">
-                    <i class="fas fa-user-shield" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
-                    <h3>Criminology</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Behavioral study of criminals</p>
-                </div>
-                <div class="glass-panel" style="text-align: center;">
-                    <i class="fas fa-laptop-code" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
-                    <h3>Cybercrime</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Digital forensics & security</p>
-                </div>
-                <div class="glass-panel" style="text-align: center;">
-                    <i class="fas fa-pills" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
-                    <h3>Drug Studies</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Narcotics trafficking analysis</p>
-                </div>
-                <div class="glass-panel" style="text-align: center;">
-                    <i class="fas fa-gavel" style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;"></i>
-                    <h3>Justice System</h3>
-                    <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.5rem;">Legal framework efficacy</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
     <footer style="background: #020c1b; padding: 2rem; text-align: center; color: var(--text-dim); border-top: var(--border);">
-        <p>&copy; 2023 NEW Crime.LK. National Crime Research Platform. All Rights Reserved.</p>
+        <p>&copy; 2026 NEW Crime.LK. National Crime Research Platform. All Rights Reserved.</p>
     </footer>
 
-    <!-- MODALS -->
-
-    <!-- Admin Login Modal -->
     <div class="modal" id="login-modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('login-modal')">&times;</span>
             <h2 style="margin-bottom: 1.5rem; color: var(--white); text-align: center;">Secure Admin Login</h2>
             <form id="login-form">
-                <div class="form-group">
-                    <label>Username / Email</label>
-                    <input type="text" id="username" required placeholder="Enter admin username or email">
-                </div>
+                <div class="form-group"><label>Username / Email</label><input type="text" id="username" required></div>
                 <div class="form-group">
                     <label>Password</label>
-                    <input type="password" id="password" required placeholder="Enter password">
+                    <div class="password-wrapper">
+                        <input type="password" id="password" required>
+                        <i class="fas fa-eye toggle-password" id="togglePassword"></i>
+                    </div>
                 </div>
                 <button type="submit" class="btn btn-primary" style="width: 100%;">Authenticate</button>
-                <p style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-dim); text-align: center;">
-                    Protected System. Authorized Personnel Only.
-                </p>
             </form>
         </div>
     </div>
 
-    <!-- Dashboard Modal (Tabs) -->
     <div class="modal" id="dashboard-modal">
         <div class="modal-content" style="max-width: 800px;">
             <span class="close-modal" onclick="closeModal('dashboard-modal')">&times;</span>
-            <h2 style="color: var(--white); margin-bottom: 1rem;">Admin Dashboard</h2>
+            <h2 style="color: var(--white); margin-bottom: 1rem;"><i class="fas fa-user-cog" style="color: var(--accent);"></i> Admin Dashboard</h2>
             
-            <!-- Dashboard Tabs -->
             <div style="display: flex; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem;">
-                <button class="btn" onclick="switchTab('tab-data')" style="border:none; color:var(--accent);">Data Mgmt</button>
-                <button class="btn" onclick="switchTab('tab-security')" style="border:none; color:var(--text-dim);">Security Center</button>
-                <button class="btn" onclick="switchTab('tab-settings')" style="border:none; color:var(--text-dim);">Settings</button>
+                <button class="btn" onclick="switchTab('tab-data')" id="tab-btn-data" style="border:none; color:var(--accent);">
+                    <i class="fas fa-database"></i> Data Mgmt
+                </button>
+                <button class="btn" onclick="switchTab('tab-security')" id="tab-btn-security" style="border:none; color:var(--text-dim);">
+                    <i class="fas fa-shield-alt"></i> Security Center
+                </button>
+                <button class="btn" onclick="switchTab('tab-settings')" id="tab-btn-settings" style="border:none; color:var(--text-dim);">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
             </div>
 
-            <!-- Tab: Data Management -->
             <div id="tab-data" class="tab-content">
-                <h3 style="color: var(--accent); margin-bottom: 1rem;">Add New Crime Record</h3>
+                <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-plus-circle"></i> Add New Crime Record</h3>
                 <form id="add-crime-form">
                     <div class="filters" style="margin-bottom: 0;">
-                        <input type="date" id="new-date" required>
+                        <input type="date" id="new-date" required min="2021-01-01" max="2026-12-31">
                         <select id="new-province" required>
                             <option value="Western">Western</option>
                             <option value="Central">Central</option>
                             <option value="Northern">Northern</option>
                             <option value="Southern">Southern</option>
+                            <option value="Eastern">Eastern</option>
+                            <option value="North Western">North Western</option>
+                            <option value="North Central">North Central</option>
+                            <option value="Uva">Uva</option>
+                            <option value="Sabaragamuwa">Sabaragamuwa</option>
                         </select>
                         <select id="new-category" required>
                             <option value="Theft">Theft</option>
                             <option value="Cybercrime">Cybercrime</option>
-                            <option value="Drug">Drug</option>
+                            <option value="Drug">Drug Offences</option>
                             <option value="Homicide">Homicide</option>
+                            <option value="Fraud">Fraud</option>
                         </select>
+                        <input type="text" id="new-district" placeholder="District" required style="width: 120px;">
                         <input type="text" id="new-desc" placeholder="Brief Description" required>
                     </div>
-                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;">Insert Record</button>
+                    <button type="submit" class="btn btn-primary" style="margin-top: 1rem;"><i class="fas fa-save"></i> Insert Record</button>
                 </form>
-                <div style="margin-top: 2rem;">
-                    <h3 style="color: var(--accent); margin-bottom: 1rem;">Quick Stats Update</h3>
-                    <p style="color: var(--text-dim); font-size: 0.9rem;">Chart datasets are automatically updated when records are added or removed via the Data Explorer.</p>
-                </div>
             </div>
 
-            <!-- Tab: Security Center -->
             <div id="tab-security" class="tab-content" style="display:none;">
-                <h3 style="color: var(--accent); margin-bottom: 1rem;">Security Center</h3>
-                <div class="glass-panel" style="padding: 1rem; font-size: 0.9rem;">
-                    <p><strong>2-Factor Authentication:</strong> <span style="color: var(--success);">Enabled</span></p>
-                    <p><strong>Active Sessions:</strong> 1 (Current IP: 192.168.1.X)</p>
-                    <p><strong>Last Failed Login:</strong> None</p>
-                    <p><strong>Encryption:</strong> AES-256</p>
+                <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-lock"></i> Security Center</h3>
+                
+                <div class="security-card">
+                    <div class="security-item">
+                        <span><i class="fas fa-key" style="color: var(--accent); width:20px;"></i> 2-Factor Authentication:</span>
+                        <span style="color: var(--success); font-weight: 600;"><i class="fas fa-check-circle"></i> Enabled</span>
+                    </div>
+                    <div class="security-item">
+                        <span><i class="fas fa-network-wired" style="color: var(--accent); width:20px;"></i> Active Sessions:</span>
+                        <span><strong>1 Active</strong> (IP: 192.168.1.X)</span>
+                    </div>
+                    <div class="security-item">
+                        <span><i class="fas fa-exclamation-triangle" style="color: var(--danger); width:20px;"></i> Last Failed Logins:</span>
+                        <span style="color: var(--text-dim);">None Recorded</span>
+                    </div>
+                    <div class="security-item">
+                        <span><i class="fas fa-user-shield" style="color: var(--accent); width:20px;"></i> Encryption Method:</span>
+                        <span><strong>AES-256 Bit</strong></span>
+                    </div>
                 </div>
-                <div style="margin-top: 1rem;">
-                    <button class="btn btn-danger" onclick="alert('Simulating: All sessions terminated')">Force Logout All Devices</button>
-                    <button class="btn" style="margin-left: 1rem;">Change Password</button>
+
+                <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                    <button class="btn btn-danger" onclick="forceLogoutAllDevices()">
+                        <i class="fas fa-power-off"></i> Force Logout All Devices
+                    </button>
+                    <button class="btn" onclick="changeAdminPassword()">
+                        <i class="fas fa-user-lock"></i> Change Password
+                    </button>
                 </div>
             </div>
 
-            <!-- Tab: Settings -->
             <div id="tab-settings" class="tab-content" style="display:none;">
-                <h3 style="color: var(--accent); margin-bottom: 1rem;">System Settings</h3>
-                <p>Backup Database</p>
-                <button class="btn btn-primary" style="margin-bottom: 1rem;">Download Backup (.json)</button>
-                <p>Website Content</p>
-                <input type="text" value="Crime Data Intelligence for Sri Lanka" style="width: 100%; margin-bottom: 1rem;">
-                <button class="btn">Update Content</button>
+                <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-cogs"></i> System Settings</h3>
+                <p style="margin-bottom: 0.5rem; color: var(--text-light);">Database Backup Management:</p>
+                <button class="btn btn-primary" onclick="downloadDatabaseBackup()">
+                    <i class="fas fa-download"></i> Download Backup (.json)
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Upload PDF Modal -->
     <div class="modal" id="upload-modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('upload-modal')">&times;</span>
-            <h2 style="color: var(--white);">Upload Research Report</h2>
+            <h2 style="color: var(--white); margin-bottom: 1rem;"><i class="fas fa-cloud-upload-alt"></i> Upload Research Report</h2>
             <form id="upload-pdf-form">
                 <div class="form-group">
                     <label>Report Title</label>
-                    <input type="text" id="pdf-title" required>
+                    <input type="text" id="pdf-title" required placeholder="Ex: Cybercrime Analysis 2026">
                 </div>
                 <div class="form-group">
                     <label>PDF File</label>
-                    <input type="file" accept=".pdf" required>
+                    <input type="file" id="pdf-file" accept=".pdf" required>
                 </div>
-                <button type="submit" class="btn btn-primary">Upload to Server</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-publish"></i> Upload & Publish</button>
             </form>
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div id="toast">Operation Successful</div>
 
     <script>
         // --- State Management ---
         const state = {
             isAuthenticated: false,
+            adminPassword: 'password123',
             user: null,
             crimeData: [
                 { id: 101, date: '2023-05-12', province: 'Western', district: 'Colombo', category: 'Theft', description: 'Vehicle theft in Nugegoda', status: 'Under Investigation' },
                 { id: 102, date: '2023-06-01', province: 'Central', district: 'Kandy', category: 'Fraud', description: 'Online banking scam', status: 'Closed' },
                 { id: 103, date: '2023-07-20', province: 'Northern', district: 'Jaffna', category: 'Cybercrime', description: 'Social media harassment', status: 'Pending' },
-                { id: 104, date: '2023-08-15', province: 'Southern', district: 'Galle', category: 'Drug', description: 'Possession of narcotics', status: 'Solved' },
-                { id: 105, date: '2023-09-10', province: 'Western', district: 'Colombo', category: 'Homicide', description: 'Gang related violence', status: 'Under Investigation' },
-                { id: 106, date: '2022-11-05', province: 'Eastern', district: 'Batticaloa', category: 'Theft', description: 'House breaking', status: 'Closed' },
+                { id: 104, date: '2024-08-15', province: 'Southern', district: 'Galle', category: 'Drug', description: 'Possession of narcotics', status: 'Solved' },
+                { id: 105, date: '2025-09-10', province: 'Western', district: 'Colombo', category: 'Homicide', description: 'Gang related violence', status: 'Under Investigation' },
+                { id: 106, date: '2026-02-14', province: 'Eastern', district: 'Batticaloa', category: 'Theft', description: 'House breaking', status: 'Closed' },
             ],
             reports: [
-                { id: 1, title: 'Annual Crime Report 2022', size: '2.4 MB', date: '2023-01-15' },
-                { id: 2, title: 'Cybercrime Trends in Sri Lanka', size: '1.8 MB', date: '2023-03-10' },
-                { id: 3, title: 'Drug Trafficking Analysis', size: '3.1 MB', date: '2023-05-22' }
+                { id: 1, title: 'Annual Crime Report 2022', size: '2.4 MB', date: '2023-01-15', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUIgplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA1CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxOCAwMDAwMCBuIAowMDAwMDAwMDY5IDAwMDAwIG4gCjAwMDAwMDAxMjEgMDAwMDAgbYgKM0AwMDAwMDAxOTYgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA1Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgogMzAxCiUlRU9G' },
+                { id: 2, title: 'Cybercrime Trends in Sri Lanka', size: '1.8 MB', date: '2023-03-10', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUIgplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA1CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxOCAwMDAwMCBuIAowMDAwMDAwMDY5IDAwMDAwIG4gCjAwMDAwMDAxMjEgMDAwMDAgbYgKM0AwMDAwMDAxOTYgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA1Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgogMzAxCiUlRU9G' }
             ]
         };
 
@@ -577,35 +556,35 @@
             toast: document.getElementById('toast'),
             loginForm: document.getElementById('login-form'),
             addCrimeForm: document.getElementById('add-crime-form'),
-            adminCols: document.querySelectorAll('.admin-only-col')
+            adminCols: document.querySelectorAll('.admin-only-col'),
+            togglePassword: document.getElementById('togglePassword'),
+            passwordInput: document.getElementById('password')
         };
 
-        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
-            initParticles();
+            initInteractiveConstellation();
             renderTable(state.crimeData);
             renderPDFs();
             initCharts();
+            updateCharts();
             animateCounters();
             setupEventListeners();
         });
 
-        // --- Authentication Logic ---
+        // --- Authentication ---
         function login(username, password) {
-            // මෙතනින් උඹේ ඊමේල් ලිපින 2 විතරක් චෙක් කරනවා
             const lowerUser = username.trim().toLowerCase();
-            if ((lowerUser === 'chamiduerangadeshan@gmail.com' || lowerUser === 'chamiduerangae14@gmail.com') && password === '20051230') {
+            if ((lowerUser === 'chamiduerangadeshan@gmail.com' || lowerUser === 'chamiduerangae14@gmail.com') && password === state.adminPassword) {
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
-                
-                // UI Updates
                 els.adminLoginBtn.style.display = 'none';
                 els.adminControls.style.display = 'flex';
                 els.pdfAdminControls.style.display = 'block';
                 els.adminCols.forEach(col => col.style.display = 'table-cell');
-                
                 closeModal('login-modal');
-                showToast('Welcome back, Administrator');
+                showToast('Welcome back, Owner');
+                renderTable(state.crimeData);
+                renderPDFs();
                 return true;
             } else {
                 showToast('Invalid Credentials');
@@ -616,36 +595,16 @@
         function logout() {
             state.isAuthenticated = false;
             state.user = null;
-            
-            els.adminLoginBtn.style.display = 'none'; // ලොග් අවුට් වුනාමත් ආයෙත් බටන් එක හංගනවා
+            els.adminLoginBtn.style.display = 'none'; 
             els.adminControls.style.display = 'none';
             els.pdfAdminControls.style.display = 'none';
             els.adminCols.forEach(col => col.style.display = 'none');
-            
+            renderTable(state.crimeData);
+            renderPDFs();
             showToast('Logged out successfully');
         }
 
-        // --- Render Functions ---
-        function renderTable(data) {
-            els.crimeTableBody.innerHTML = '';
-            data.forEach(crime => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>#${crime.id}</td>
-                    <td>${crime.date}</td>
-                    <td>${crime.province}</td>
-                    <td>${crime.district}</td>
-                    <td><span style="color: var(--accent)">${crime.category}</span></td>
-                    <td>${crime.description}</td>
-                    <td>${crime.status}</td>
-                    <td class="admin-only-col" style="display: ${state.isAuthenticated ? 'table-cell' : 'none'}">
-                        <button class="btn btn-danger" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" onclick="deleteCrime(${crime.id})">Delete</button>
-                    </td>
-                `;
-                els.crimeTableBody.appendChild(tr);
-            });
-        }
-
+        // --- PDF Rendering & Download Logic ---
         function renderPDFs() {
             els.pdfContainer.innerHTML = '';
             state.reports.forEach(pdf => {
@@ -660,15 +619,164 @@
                         </div>
                     </div>
                     <div>
-                        <button class="btn" style="font-size: 0.8rem;">Download</button>
-                        <button class="btn btn-danger admin-only-del" style="display: ${state.isAuthenticated ? 'inline-block' : 'none'}; font-size: 0.8rem; margin-left: 5px;" onclick="deletePDF(${pdf.id})">Remove</button>
+                        <button class="btn" style="font-size: 0.8rem;" onclick="downloadPDFFile(${pdf.id})"><i class="fas fa-download"></i> Download</button>
+                        <button class="btn btn-danger admin-only-del" style="display: ${state.isAuthenticated ? 'inline-block' : 'none'}; font-size: 0.8rem; margin-left: 5px;" onclick="deletePDF(${pdf.id})"><i class="fas fa-trash"></i> Remove</button>
                     </div>
                 `;
                 els.pdfContainer.appendChild(li);
             });
         }
 
-        // --- Data Management ---
+        window.downloadPDFFile = function(id) {
+            const report = state.reports.find(r => r.id === id);
+            if(report && report.fileData) {
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.href = report.fileData;
+                downloadAnchor.download = `${report.title.replace(/\s+/g, '_')}.pdf`;
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                document.body.removeChild(downloadAnchor);
+                showToast(`Downloading: ${report.title}`);
+            } else {
+                showToast("Error: File source data not found.");
+            }
+        };
+
+        window.deletePDF = function(id) {
+            if (!confirm('Remove this report permanently?')) return;
+            state.reports = state.reports.filter(r => r.id !== id);
+            renderPDFs();
+            showToast('Report removed successfully');
+        };
+
+        // --- Simulation Actions for Security ---
+        window.forceLogoutAllDevices = function() {
+            showToast("Terminating all other active sessions...");
+            setTimeout(() => { showToast("All external sessions terminated safely."); }, 1200);
+        }
+
+        window.changeAdminPassword = function() {
+            const newPass = prompt("Enter new Administrator password:");
+            if(newPass && newPass.trim().length > 4) {
+                state.adminPassword = newPass.trim();
+                showToast("Admin password changed successfully!");
+            } else if(newPass) {
+                showToast("Password too short! Must be at least 5 characters.");
+            }
+        }
+
+        window.downloadDatabaseBackup = function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state.crimeData, null, 4));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", "crimelk_db_backup.json");
+            document.body.appendChild(dlAnchor);
+            dlAnchor.click();
+            dlAnchor.removeChild();
+            showToast("Database JSON backup downloaded!");
+        }
+
+        // --- Data Handling & Event Listeners ---
+        function setupEventListeners() {
+            window.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
+                    e.preventDefault();
+                    openModal('login-modal');
+                }
+            });
+
+            els.adminLoginBtn.addEventListener('click', () => openModal('login-modal'));
+            els.dashboardBtn.addEventListener('click', () => openModal('dashboard-modal'));
+            els.logoutBtn.addEventListener('click', logout);
+            
+            els.loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                login(document.getElementById('username').value, document.getElementById('password').value);
+            });
+
+            els.togglePassword.addEventListener('click', function () {
+                const type = els.passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                els.passwordInput.setAttribute('type', type);
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+
+            document.getElementById('upload-pdf-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const title = document.getElementById('pdf-title').value;
+                const fileInput = document.getElementById('pdf-file');
+                
+                if(fileInput.files.length === 0) {
+                    showToast("Please select a PDF file first.");
+                    return;
+                }
+
+                const file = fileInput.files[0];
+                const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    state.reports.push({
+                        id: Date.now(),
+                        title: title,
+                        size: fileSizeMB,
+                        date: new Date().toISOString().split('T')[0],
+                        fileData: event.target.result
+                    });
+                    
+                    renderPDFs();
+                    closeModal('upload-modal');
+                    showToast('Research Paper published and downloadable!');
+                    document.getElementById('upload-pdf-form').reset();
+                };
+                
+                reader.readAsDataURL(file);
+            });
+
+            els.addCrimeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const newRecord = {
+                    id: 100 + state.crimeData.length + 1,
+                    date: document.getElementById('new-date').value,
+                    province: document.getElementById('new-province').value,
+                    district: document.getElementById('new-district').value || 'Unknown', 
+                    category: document.getElementById('new-category').value,
+                    description: document.getElementById('new-desc').value,
+                    status: 'Pending'
+                };
+                state.crimeData.push(newRecord);
+                renderTable(state.crimeData);
+                updateCharts();
+                closeModal('dashboard-modal');
+                showToast('New Crime Record Inserted');
+                els.addCrimeForm.reset();
+            });
+
+            ['search-input', 'filter-province', 'filter-category', 'filter-year'].forEach(id => {
+                document.getElementById(id).addEventListener('input', filterData);
+            });
+        }
+
+        function renderTable(data) {
+            els.crimeTableBody.innerHTML = '';
+            data.forEach(crime => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>#${crime.id}</td>
+                    <td>${crime.date}</td>
+                    <td>${crime.province}</td>
+                    <td>${crime.district}</td>
+                    <td><span style="color: var(--accent)">${crime.category}</span></td>
+                    <td>${crime.description}</td>
+                    <td>${crime.status}</td>
+                    <td class="admin-only-col" style="display: ${state.isAuthenticated ? 'table-cell' : 'none'}">
+                        <button class="btn btn-danger" style="padding: 0.2rem 0.5rem; font-size: 0.8rem;" onclick="deleteCrime(${crime.id})"><i class="fas fa-trash"></i> Delete</button>
+                    </td>
+                `;
+                els.crimeTableBody.appendChild(tr);
+            });
+        }
+
         window.deleteCrime = function(id) {
             if (!confirm('Are you sure you want to delete this record?')) return;
             state.crimeData = state.crimeData.filter(c => c.id !== id);
@@ -677,14 +785,6 @@
             showToast('Record deleted');
         };
 
-        window.deletePDF = function(id) {
-            if (!confirm('Remove this report?')) return;
-            state.reports = state.reports.filter(r => r.id !== id);
-            renderPDFs();
-            showToast('Report removed');
-        };
-
-        // --- Filter Logic ---
         function filterData() {
             const search = document.getElementById('search-input').value.toLowerCase();
             const province = document.getElementById('filter-province').value;
@@ -698,210 +798,163 @@
                 const matchYear = year === 'all' || item.date.startsWith(year);
                 return matchSearch && matchProv && matchCat && matchYear;
             });
-
             renderTable(filtered);
         }
 
-        // --- Event Listeners ---
-        function setupEventListeners() {
-            // Secret Shortcut Key Listener: Ctrl + Shift + A ඔබපු ගමන් ලොගින් බොක්ස් එක එනවා
-            window.addEventListener('keydown', (e) => {
-                if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
-                    e.preventDefault();
-                    openModal('login-modal');
-                }
-            });
-
-            els.adminLoginBtn.addEventListener('click', () => openModal('login-modal'));
-            els.dashboardBtn.addEventListener('click', () => openModal('dashboard-modal'));
-            els.logoutBtn.addEventListener('click', logout);
-            
-            // Login
-            els.loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                login(document.getElementById('username').value, document.getElementById('password').value);
-            });
-
-            // Add Crime
-            els.addCrimeForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const newRecord = {
-                    id: 100 + state.crimeData.length + 1,
-                    date: document.getElementById('new-date').value,
-                    province: document.getElementById('new-province').value,
-                    district: 'Unknown', 
-                    category: document.getElementById('new-category').value,
-                    description: document.getElementById('new-desc').value,
-                    status: 'Pending'
-                };
-                state.crimeData.push(newRecord);
-                renderTable(state.crimeData);
-                updateCharts();
-                closeModal('dashboard-modal');
-                showToast('New Record Added');
-                els.addCrimeForm.reset();
-            });
-
-            // Filters
-            ['search-input', 'filter-province', 'filter-category', 'filter-year'].forEach(id => {
-                document.getElementById(id).addEventListener('input', filterData);
-            });
-
-            // PDF Upload
-            document.getElementById('upload-pdf-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const title = document.getElementById('pdf-title').value;
-                state.reports.push({
-                    id: Date.now(),
-                    title: title,
-                    size: '1.2 MB', 
-                    date: new Date().toISOString().split('T')[0]
-                });
-                renderPDFs();
-                closeModal('upload-modal');
-                showToast('PDF Uploaded Successfully');
-                document.getElementById('pdf-title').value = '';
-            });
-        }
-
-        // --- Modal Utilities ---
-        window.openModal = (id) => document.getElementById(id).classList.add('active');
+        // --- Modals & Tab Navigation ---
+        window.openModal = (id) => {
+            document.getElementById(id).classList.add('active');
+            if(id === 'login-modal') {
+                els.passwordInput.setAttribute('type', 'password');
+                els.togglePassword.classList.add('fa-eye');
+                els.togglePassword.classList.remove('fa-eye-slash');
+            }
+        };
         window.closeModal = (id) => document.getElementById(id).classList.remove('active');
+        window.openUploadModal = () => openModal('upload-modal');
         window.switchTab = (tabId) => {
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
             document.getElementById(tabId).style.display = 'block';
+            ['data', 'security', 'settings'].forEach(t => {
+                document.getElementById(`tab-btn-${t}`).style.color = 'var(--text-dim)';
+            });
+            document.getElementById(`tab-btn-${tabId.replace('tab-', '')}`).style.color = 'var(--accent)';
         };
-        window.openUploadModal = () => openModal('upload-modal');
 
-        // --- Toast ---
         function showToast(msg) {
             els.toast.textContent = msg;
             els.toast.classList.add('show');
             setTimeout(() => els.toast.classList.remove('show'), 3000);
         }
 
-        // --- Chart.js Logic ---
+        // --- Chart.js ---
         let charts = {};
-
         function initCharts() {
-            // Line Chart
             const ctx1 = document.getElementById('lineChart').getContext('2d');
             charts.line = new Chart(ctx1, {
                 type: 'line',
                 data: {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                    datasets: [{
-                        label: 'Crime Incidents',
-                        data: [65, 59, 80, 81, 56, 55],
-                        borderColor: '#64ffda',
-                        backgroundColor: 'rgba(100, 255, 218, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    labels: ['2021', '2022', '2023', '2024', '2025', '2026'],
+                    datasets: [{ label: 'Crime Incidents Trend', data: [0, 0, 0, 0, 0, 0], borderColor: '#64ffda', backgroundColor: 'rgba(100, 255, 218, 0.1)', fill: true, tension: 0.4 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccd6f6' } } }, scales: { y: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
 
-            // Bar Chart
             const ctx2 = document.getElementById('barChart').getContext('2d');
             charts.bar = new Chart(ctx2, {
                 type: 'bar',
                 data: {
-                    labels: ['Western', 'Central', 'Northern', 'Southern', 'Eastern'],
-                    datasets: [{
-                        label: 'Cases by Province',
-                        data: [120, 90, 60, 80, 45],
-                        backgroundColor: '#64ffda',
-                        borderColor: '#64ffda',
-                        borderWidth: 1
-                    }]
+                    labels: ['Western', 'Central', 'Northern', 'Southern', 'Eastern', 'North Western', 'North Central', 'Uva', 'Sabaragamuwa'],
+                    datasets: [{ label: 'Cases by Province', data: [0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#64ffda', borderWidth: 1 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccd6f6' } } }, scales: { y: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
 
-            // Pie Chart
             const ctx3 = document.getElementById('pieChart').getContext('2d');
             charts.pie = new Chart(ctx3, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Theft', 'Cybercrime', 'Drug', 'Violent', 'Other'],
-                    datasets: [{
-                        data: [30, 20, 25, 15, 10],
-                        backgroundColor: ['#64ffda', '#58a6ff', '#ff7b72', '#d2a8ff', '#ffffff'],
-                        borderWidth: 0
-                    }]
+                    labels: ['Theft', 'Cybercrime', 'Drug', 'Homicide', 'Fraud'],
+                    datasets: [{ data: [0, 0, 0, 0, 0], backgroundColor: ['#64ffda', '#58a6ff', '#ff7b72', '#d2a8ff', '#ffffff'], borderWidth: 0 }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#ccd6f6' } } } }
             });
 
-            // Area Chart
             const ctx4 = document.getElementById('areaChart').getContext('2d');
             charts.area = new Chart(ctx4, {
                 type: 'line',
                 data: {
-                    labels: ['2019', '2020', '2021', '2022', '2023'],
-                    datasets: [{
-                        label: 'Clearance Rate (%)',
-                        data: [45, 48, 42, 55, 60],
-                        borderColor: '#58a6ff',
-                        backgroundColor: 'rgba(88, 166, 255, 0.2)',
-                        fill: true
-                    }]
+                    labels: ['Pending', 'Under Investigation', 'Solved', 'Closed'],
+                    datasets: [{ label: 'Status Volume', data: [0, 0, 0, 0], borderColor: '#58a6ff', backgroundColor: 'rgba(88, 166, 255, 0.2)', fill: true }]
                 },
                 options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccd6f6' } } }, scales: { y: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
             });
         }
 
         function updateCharts() {
-            const count = state.crimeData.length;
-            charts.bar.data.datasets[0].data = [count + 20, count * 0.8, count * 0.5, count * 0.7, count * 0.4];
-            charts.bar.update();
-            
-            charts.line.data.datasets[0].data = [count+10, count+5, count+12, count+8, count+2, count];
+            const years = ['2021', '2022', '2023', '2024', '2025', '2026'];
+            charts.line.data.datasets[0].data = years.map(y => state.crimeData.filter(c => c.date.startsWith(y)).length);
             charts.line.update();
+
+            const provinces = ['Western', 'Central', 'Northern', 'Southern', 'Eastern', 'North Western', 'North Central', 'Uva', 'Sabaragamuwa'];
+            charts.bar.data.datasets[0].data = provinces.map(p => state.crimeData.filter(c => c.province === p).length);
+            charts.bar.update();
+
+            const categories = ['Theft', 'Cybercrime', 'Drug', 'Homicide', 'Fraud'];
+            charts.pie.data.datasets[0].data = categories.map(cat => state.crimeData.filter(c => c.category === cat).length);
+            charts.pie.update();
+
+            const statuses = ['Pending', 'Under Investigation', 'Solved', 'Closed'];
+            charts.area.data.datasets[0].data = statuses.map(s => state.crimeData.filter(c => c.status === s).length);
+            charts.area.update();
         }
 
-        // --- Particle Animation ---
-        function initParticles() {
-            const canvas = document.getElementById('particleCanvas');
+        // --- Interactive Constellation Network ---
+        function initInteractiveConstellation() {
+            const canvas = document.getElementById('interactiveCanvas');
             const ctx = canvas.getContext('2d');
+            
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
-            let particlesArray;
-            let mouse = { x: null, y: null, radius: 150 };
-
-            window.addEventListener('mousemove', (event) => {
-                mouse.x = event.x;
-                mouse.y = event.y;
-            });
+            let particlesArray = [];
+            const maxDistance = 100;
+            const mouse = { x: null, y: null, radius: 150 };
+            
+            window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
+            window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
 
             class Particle {
-                constructor(x, y, directionX, directionY, size, color) {
-                    this.x = x; this.y = y; this.directionX = directionX; this.directionY = directionY;
-                    this.size = size; this.color = color;
+                constructor(x, y, vx, vy, size) {
+                    this.x = x; this.y = y; this.vx = vx; this.vy = vy; this.size = size;
                 }
                 draw() {
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                    ctx.fillStyle = this.color;
+                    ctx.fillStyle = 'rgba(100, 255, 218, 0.7)';
                     ctx.fill();
                 }
                 update() {
-                    if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
-                    if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
-                    
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx*dx + dy*dy);
-                    if (distance < mouse.radius + this.size) {
-                        if (mouse.x < this.x && this.x < canvas.width - this.size * 10) this.x += 10;
-                        if (mouse.x > this.x && this.x > this.size * 10) this.x -= 10;
-                        if (mouse.y < this.y && this.y < canvas.height - this.size * 10) this.y += 10;
-                        if (mouse.y > this.y && this.y > this.size * 10) this.y -= 10;
-                    }
-                    this.x += this.directionX; this.y += this.directionY;
+                    if (this.x > canvas.width || this.x < 0) this.vx = -this.vx;
+                    if (this.y > canvas.height || this.y < 0) this.vy = -this.vy;
+                    this.x += this.vx; this.y += this.vy;
                     this.draw();
+                }
+            }
+
+            function connect() {
+                let opacityValue = 1;
+                for (let a = 0; a < particlesArray.length; a++) {
+                    for (let b = a; b < particlesArray.length; b++) {
+                        let dx = particlesArray[a].x - particlesArray[b].x;
+                        let dy = particlesArray[a].y - particlesArray[b].y;
+                        let distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < maxDistance) {
+                            opacityValue = 1 - (distance / maxDistance);
+                            ctx.strokeStyle = `rgba(100, 255, 218, ${opacityValue * 0.15})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                            ctx.stroke();
+                        }
+                    }
+
+                    if (mouse.x != null && mouse.y != null) {
+                        let mdx = particlesArray[a].x - mouse.x;
+                        let mdy = particlesArray[a].y - mouse.y;
+                        let mDistance = Math.sqrt(mdx * mdx + mdy * mdy);
+                        if (mDistance < mouse.radius) {
+                            let mOpacity = 1 - (mDistance / mouse.radius);
+                            ctx.strokeStyle = `rgba(100, 255, 218, ${mOpacity * 0.35})`;
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(mouse.x, mouse.y);
+                            ctx.stroke();
+                        }
+                    }
                 }
             }
 
@@ -910,54 +963,27 @@
                 let numberOfParticles = (canvas.height * canvas.width) / 9000;
                 for (let i = 0; i < numberOfParticles; i++) {
                     let size = (Math.random() * 2) + 1;
-                    let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
-                    let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                    let directionX = (Math.random() * 2) - 1; 
-                    let directionY = (Math.random() * 2) - 1;
-                    let color = '#64ffda';
-                    particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+                    let x = Math.random() * (innerWidth - size * 2) + size;
+                    let y = Math.random() * (innerHeight - size * 2) + size;
+                    let vx = (Math.random() * 1) - 0.5; let vy = (Math.random() * 1) - 0.5;
+                    particlesArray.push(new Particle(x, y, vx, vy, size));
                 }
             }
 
             function animate() {
-                requestAnimationFrame(animate);
                 ctx.clearRect(0, 0, innerWidth, innerHeight);
-                for (let i = 0; i < particlesArray.length; i++) {
-                    particlesArray[i].update();
-                }
+                for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); }
                 connect();
-            }
-
-            function connect() {
-                let opacityValue = 1;
-                for (let a = 0; a < particlesArray.length; a++) {
-                    for (let b = a; b < particlesArray.length; b++) {
-                        let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
-                                       ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
-                        if (distance < (canvas.width/7) * (canvas.height/7)) {
-                            opacityValue = 1 - (distance / 20000);
-                            ctx.strokeStyle = 'rgba(100, 255, 218,' + opacityValue + ')';
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
+                requestAnimationFrame(animate);
             }
 
             window.addEventListener('resize', () => {
-                canvas.width = innerWidth;
-                canvas.height = innerHeight;
-                init();
+                canvas.width = innerWidth; canvas.height = innerHeight; init();
             });
 
-            init();
-            animate();
+            init(); animate();
         }
 
-        // --- Animated Counters ---
         function animateCounters() {
             const counters = document.querySelectorAll('.stat-number');
             counters.forEach(counter => {
@@ -965,12 +991,7 @@
                     const target = +counter.getAttribute('data-target');
                     const count = +counter.innerText;
                     const inc = target / 200;
-                    if (count < target) {
-                        counter.innerText = Math.ceil(count + inc);
-                        setTimeout(updateCount, 20);
-                    } else {
-                        counter.innerText = target.toLocaleString();
-                    }
+                    if (count < target && count === 0) { counter.innerText = Math.ceil(count + inc); setTimeout(updateCount, 20); }
                 };
                 updateCount();
             });
