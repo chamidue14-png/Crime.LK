@@ -574,7 +574,7 @@
         // --- Authentication ---
         function login(username, password) {
             const lowerUser = username.trim().toLowerCase();
-            if ((lowerUser === 'chamiduerangadeshan@gmail.com' || lowerUser === 'chamiduerangae14@gmail.com') && password === state.adminPassword) {
+            if ((lowerUser === 'chamiduerangadeshan@gmail.com' || lowerUser === 'chamiduerangae14@gmail.com') && password === state.adminPassword) {20051230
                 state.isAuthenticated = true;
                 state.user = { name: 'Super Admin', role: 'owner' };
                 els.adminLoginBtn.style.display = 'none';
