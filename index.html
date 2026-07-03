@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Google Search SEO ටැග්ස් -->
     <title>Crime.LK - National Crime Research Platform Sri Lanka</title>
     <meta name="description" content="NEW Crime.LK is the National Crime Research Platform for Sri Lanka, transforming crime statistics into meaningful research insights.">
     <meta name="keywords" content="Crime.LK, Crime LK, Sri Lanka Crime Research, Crime Data Sri Lanka, Chamidu Eranga Deshan">
     <meta name="author" content="Chamidu Eranga Deshan">
     <meta name="robots" content="index, follow">
     
-    <!-- නිවැරදි Canonical URL එක මෙන්න මචන් -->
     <link rel="canonical" href="https://chamidue14-png.github.io/Crime.LK/">
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -41,10 +39,8 @@
             line-height: 1.6;
         }
 
-        /* --- Animations --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* --- Background Canvas --- */
         #canvas-container {
             position: fixed;
             top: 0;
@@ -55,7 +51,6 @@
             background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
         }
 
-        /* --- Navigation --- */
         nav {
             position: fixed;
             top: 0;
@@ -85,7 +80,6 @@
         }
         .nav-links a:hover, .nav-links a.active { color: var(--accent); }
         
-        /* --- Buttons --- */
         .btn {
             padding: 0.6rem 1.5rem;
             border: 1px solid var(--accent);
@@ -104,7 +98,6 @@
         .btn-danger { border-color: var(--danger); color: var(--danger); }
         .btn-danger:hover { background: rgba(255, 95, 95, 0.1); }
         
-        /* --- Admin Controls --- */
         .admin-controls {
             display: none;
             gap: 1rem;
@@ -120,16 +113,13 @@
             margin-left: 5px;
         }
 
-        /* --- Layout --- */
         section { padding: 6rem 5% 4rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
         .container { max-width: 1200px; margin: 0 auto; width: 100%; }
         
-        /* --- Hero --- */
         #home { align-items: flex-start; text-align: left; }
         .hero-title { font-size: 3.5rem; color: var(--white); margin-bottom: 1rem; animation: fadeIn 1s ease-out; }
         .hero-subtitle { font-size: 1.2rem; color: var(--text-dim); max-width: 600px; margin-bottom: 2rem; animation: fadeIn 1.2s ease-out; }
         
-        /* --- Stats Cards --- */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -148,7 +138,6 @@
         .stat-number { font-size: 2.5rem; font-weight: 700; color: var(--accent); display: block; }
         .stat-label { font-size: 0.9rem; color: var(--text-dim); }
 
-        /* --- Explorer & Tables --- */
         .glass-panel {
             background: var(--glass);
             padding: 2rem;
@@ -172,11 +161,9 @@
         th { color: var(--accent); font-size: 0.85rem; text-transform: uppercase; }
         tr:hover { background: rgba(255,255,255,0.02); }
 
-        /* --- Charts --- */
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 2rem; }
         .chart-container { position: relative; height: 300px; width: 100%; }
 
-        /* --- PDF Repo --- */
         .pdf-list { list-style: none; }
         .pdf-item {
             display: flex;
@@ -190,7 +177,6 @@
         }
         .pdf-item:hover { background: rgba(255,255,255,0.06); }
 
-        /* --- Modals --- */
         .modal {
             display: none;
             position: fixed;
@@ -219,7 +205,6 @@
         .form-group label { display: block; margin-bottom: 0.5rem; color: var(--accent); font-size: 0.9rem; }
         .form-group input, .form-group select, .form-group textarea { width: 100%; }
 
-        /* Security Tab Specific Layout */
         .security-card {
             background: rgba(255, 255, 255, 0.03);
             border: var(--border);
@@ -251,7 +236,6 @@
         }
         .toggle-password:hover { color: var(--accent); }
 
-        /* Toast Notification */
         #toast {
             position: fixed;
             bottom: 2rem;
@@ -310,11 +294,11 @@
 
     <div class="container">
         <div class="stats-grid">
-            <div class="stat-card"><span class="stat-number" id="stat-total" data-target="12543">0</span><span class="stat-label">Total Incidents</span></div>
-            <div class="stat-card"><span class="stat-number" id="stat-property" data-target="3420">0</span><span class="stat-label">Property Crimes</span></div>
-            <div class="stat-card"><span class="stat-number" id="stat-cyber" data-target="876">0</span><span class="stat-label">Cybercrime</span></div>
-            <div class="stat-card"><span class="stat-number" id="stat-drugs" data-target="2109">0</span><span class="stat-label">Drug Offences</span></div>
-            <div class="stat-card"><span class="stat-number" id="stat-homicide" data-target="98">0</span><span class="stat-label">Homicide</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-total" data-target="35240">0</span><span class="stat-label">Total Incidents</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-property" data-target="8420">0</span><span class="stat-label">Property Crimes</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-cyber" data-target="1876">0</span><span class="stat-label">Cybercrime</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-drugs" data-target="12109">0</span><span class="stat-label">Drug Offences</span></div>
+            <div class="stat-card"><span class="stat-number" id="stat-homicide" data-target="498">0</span><span class="stat-label">Homicide</span></div>
         </div>
     </div>
 
@@ -501,7 +485,7 @@
             </div>
 
             <div id="tab-settings" class="tab-content" style="display:none;">
-                <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-cogs"></i> System Settings</h3>
+                <h3 style="color: var(--accent);">System Settings</h3>
                 <p style="margin-bottom: 0.5rem; color: var(--text-light);">Database Backup Management:</p>
                 <button class="btn btn-primary" onclick="downloadDatabaseBackup()">
                     <i class="fas fa-download"></i> Download Backup (.json)
@@ -531,26 +515,17 @@
     <div id="toast">Operation Successful</div>
 
     <script>
-        // --- State Management ---
         const state = {
             isAuthenticated: false,
             adminPassword: 'password123',
             user: null,
-            crimeData: [
-                { id: 101, date: '2023-05-12', province: 'Western', district: 'Colombo', category: 'Theft', description: 'Vehicle theft in Nugegoda', status: 'Under Investigation' },
-                { id: 102, date: '2023-06-01', province: 'Central', district: 'Kandy', category: 'Fraud', description: 'Online banking scam', status: 'Closed' },
-                { id: 103, date: '2023-07-20', province: 'Northern', district: 'Jaffna', category: 'Cybercrime', description: 'Social media harassment', status: 'Pending' },
-                { id: 104, date: '2024-08-15', province: 'Southern', district: 'Galle', category: 'Drug', description: 'Possession of narcotics', status: 'Solved' },
-                { id: 105, date: '2025-09-10', province: 'Western', district: 'Colombo', category: 'Homicide', description: 'Gang related violence', status: 'Under Investigation' },
-                { id: 106, date: '2026-02-14', province: 'Eastern', district: 'Batticaloa', category: 'Theft', description: 'House breaking', status: 'Closed' },
-            ],
+            crimeData: [], // දත්ත data.json මඟින් ලෝඩ් වේ
             reports: [
                 { id: 1, title: 'Annual Crime Report 2022', size: '2.4 MB', date: '2023-01-15', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUIgplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA1CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxOCAwMDAwMCBuIAowMDAwMDAwMDY5IDAwMDAwIG4gCjAwMDAwMDAxZEEgMDAwMDAgbYgKM0AwMDAwMDAxOTYgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA1Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgogMzAxCiUlRU9G' },
                 { id: 2, title: 'Cybercrime Trends in Sri Lanka', size: '1.8 MB', date: '2023-03-10', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUIgplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA1CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxOCAwMDAwMCBuIAowMDAwMDAwMDY5IDAwMDAwIG4gCjAwMDAwMDAxZEEgMDAwMDAgbYgKM0AwMDAwMDAxOTYgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA1Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgogMzAxCiUlRU9G' }
             ]
         };
 
-        // --- DOM Elements ---
         const els = {
             adminLoginBtn: document.getElementById('btn-admin-login'),
             adminControls: document.getElementById('admin-controls'),
@@ -572,15 +547,28 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             initInteractiveConstellation();
-            renderTable(state.crimeData);
-            renderPDFs();
             initCharts();
-            updateCharts();
+            // JSON ගොනුවෙන් දත්ත ලබා ගැනීම (Fetch Data)
+            fetch('data.json')
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    state.crimeData = data;
+                    renderTable(state.crimeData);
+                    updateCharts();
+                })
+                .catch(error => {
+                    console.error('Error loading data.json:', error);
+                    showToast('Failed to load real database records.');
+                });
+                
+            renderPDFs();
             animateCounters();
             setupEventListeners();
         });
 
-        // --- Authentication ---
         function login(username, password) {
             const lowerUser = username.trim().toLowerCase();
             if ((lowerUser === 'chamiduerangadeshan@gmail.com' || lowerUser === 'chamiduerangae14@gmail.com') && password === state.adminPassword) {
@@ -613,7 +601,6 @@
             showToast('Logged out successfully');
         }
 
-        // --- PDF Rendering & Download Logic ---
         function renderPDFs() {
             els.pdfContainer.innerHTML = '';
             state.reports.forEach(pdf => {
@@ -658,7 +645,6 @@
             showToast('Report removed successfully');
         };
 
-        // --- Simulation Actions for Security ---
         window.forceLogoutAllDevices = function() {
             showToast("Terminating all other active sessions...");
             setTimeout(() => { showToast("All external sessions terminated safely."); }, 1200);
@@ -681,11 +667,10 @@
             dlAnchor.setAttribute("download", "crimelk_db_backup.json");
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
-            dlAnchor.removeChild();
+            document.body.removeChild(dlAnchor);
             showToast("Database JSON backup downloaded!");
         }
 
-        // --- Data Handling & Event Listeners ---
         function setupEventListeners() {
             window.addEventListener('keydown', (e) => {
                 if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') {
@@ -745,7 +730,7 @@
             els.addCrimeForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const newRecord = {
-                    id: 100 + state.crimeData.length + 1,
+                    id: 202600 + state.crimeData.length + 1,
                     date: document.getElementById('new-date').value,
                     province: document.getElementById('new-province').value,
                     district: document.getElementById('new-district').value || 'Unknown', 
@@ -757,7 +742,7 @@
                 renderTable(state.crimeData);
                 updateCharts();
                 closeModal('dashboard-modal');
-                showToast('New Crime Record Inserted');
+                showToast('Temporary Record Inserted. Update data.json to save permanently.');
                 els.addCrimeForm.reset();
             });
 
@@ -791,7 +776,7 @@
             state.crimeData = state.crimeData.filter(c => c.id !== id);
             renderTable(state.crimeData);
             updateCharts(); 
-            showToast('Record deleted');
+            showToast('Record removed from session');
         };
 
         function filterData() {
@@ -810,7 +795,6 @@
             renderTable(filtered);
         }
 
-        // --- Modals & Tab Navigation ---
         window.openModal = (id) => {
             document.getElementById(id).classList.add('active');
             if(id === 'login-modal') {
@@ -836,7 +820,6 @@
             setTimeout(() => els.toast.classList.remove('show'), 3000);
         }
 
-        // --- Chart.js ---
         let charts = {};
         function initCharts() {
             const ctx1 = document.getElementById('lineChart').getContext('2d');
@@ -881,6 +864,8 @@
         }
 
         function updateCharts() {
+            if(!state.crimeData || state.crimeData.length === 0) return;
+            
             const years = ['2021', '2022', '2023', '2024', '2025', '2026'];
             charts.line.data.datasets[0].data = years.map(y => state.crimeData.filter(c => c.date.startsWith(y)).length);
             charts.line.update();
@@ -898,7 +883,6 @@
             charts.area.update();
         }
 
-        // --- Interactive Constellation Network ---
         function initInteractiveConstellation() {
             const canvas = document.getElementById('interactiveCanvas');
             const ctx = canvas.getContext('2d');
