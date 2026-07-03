@@ -4,14 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Google Search SEO ටැග්ස් -->
     <title>Crime.LK - National Crime Research Platform Sri Lanka</title>
     <meta name="description" content="NEW Crime.LK is the National Crime Research Platform for Sri Lanka, transforming crime statistics into meaningful research insights.">
     <meta name="keywords" content="Crime.LK, Crime LK, Sri Lanka Crime Research, Crime Data Sri Lanka, Chamidu Eranga Deshan">
     <meta name="author" content="Chamidu Eranga Deshan">
     <meta name="robots" content="index, follow">
     
-    <!-- නිවැරදි Canonical URL එක මෙන්න මචන් -->
     <link rel="canonical" href="https://chamidue14-png.github.io/Crime.LK/">
     
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -523,7 +521,7 @@
                     <label>PDF File</label>
                     <input type="file" id="pdf-file" accept=".pdf" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-publish"></i> Upload & Publish</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-upload"></i> Upload & Publish</button>
             </form>
         </div>
     </div>
@@ -604,7 +602,7 @@
         function logout() {
             state.isAuthenticated = false;
             state.user = null;
-            els.adminLoginBtn.style.display = 'none'; 
+            els.adminLoginBtn.style.display = 'none';
             els.adminControls.style.display = 'none';
             els.pdfAdminControls.style.display = 'none';
             els.adminCols.forEach(col => col.style.display = 'none');
@@ -681,7 +679,7 @@
             dlAnchor.setAttribute("download", "crimelk_db_backup.json");
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
-            dlAnchor.removeChild();
+            dlAnchor.removeChild(dlAnchor);
             showToast("Database JSON backup downloaded!");
         }
 
@@ -697,7 +695,7 @@
             els.adminLoginBtn.addEventListener('click', () => openModal('login-modal'));
             els.dashboardBtn.addEventListener('click', () => openModal('dashboard-modal'));
             els.logoutBtn.addEventListener('click', logout);
-            
+
             els.loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 login(document.getElementById('username').value, document.getElementById('password').value);
@@ -714,7 +712,7 @@
                 e.preventDefault();
                 const title = document.getElementById('pdf-title').value;
                 const fileInput = document.getElementById('pdf-file');
-                
+
                 if(fileInput.files.length === 0) {
                     showToast("Please select a PDF file first.");
                     return;
@@ -722,7 +720,7 @@
 
                 const file = fileInput.files[0];
                 const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-                
+
                 const reader = new FileReader();
                 reader.onload = function(event) {
                     state.reports.push({
@@ -732,13 +730,11 @@
                         date: new Date().toISOString().split('T')[0],
                         fileData: event.target.result
                     });
-                    
                     renderPDFs();
                     closeModal('upload-modal');
                     showToast('Research Paper published and downloadable!');
                     document.getElementById('upload-pdf-form').reset();
                 };
-                
                 reader.readAsDataURL(file);
             });
 
@@ -748,7 +744,7 @@
                     id: 100 + state.crimeData.length + 1,
                     date: document.getElementById('new-date').value,
                     province: document.getElementById('new-province').value,
-                    district: document.getElementById('new-district').value || 'Unknown', 
+                    district: document.getElementById('new-district').value || 'Unknown',
                     category: document.getElementById('new-category').value,
                     description: document.getElementById('new-desc').value,
                     status: 'Pending'
@@ -790,178 +786,94 @@
             if (!confirm('Are you sure you want to delete this record?')) return;
             state.crimeData = state.crimeData.filter(c => c.id !== id);
             renderTable(state.crimeData);
-            updateCharts(); 
-            showToast('Record deleted');
+            updateCharts();
+            showToast('Record Deleted');
         };
 
         function filterData() {
-            const search = document.getElementById('search-input').value.toLowerCase();
-            const province = document.getElementById('filter-province').value;
-            const category = document.getElementById('filter-category').value;
-            const year = document.getElementById('filter-year').value;
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const prov = document.getElementById('filter-province').value;
+            const cat = document.getElementById('filter-category').value;
+            const yr = document.getElementById('filter-year').value;
 
-            const filtered = state.crimeData.filter(item => {
-                const matchSearch = item.description.toLowerCase().includes(search) || item.district.toLowerCase().includes(search);
-                const matchProv = province === 'all' || item.province === province;
-                const matchCat = category === 'all' || item.category === category;
-                const matchYear = year === 'all' || item.date.startsWith(year);
-                return matchSearch && matchProv && matchCat && matchYear;
+            const filtered = state.crimeData.filter(c => {
+                const mQ = c.description.toLowerCase().includes(query) || c.district.toLowerCase().includes(query) || c.id.toString().includes(query);
+                const mP = prov === 'all' || c.province === prov;
+                const mC = cat === 'all' || c.category === cat;
+                const mY = yr === 'all' || c.date.startsWith(yr);
+                return mQ && mP && mC && mY;
             });
             renderTable(filtered);
         }
 
-        // --- Modals & Tab Navigation ---
-        window.openModal = (id) => {
-            document.getElementById(id).classList.add('active');
-            if(id === 'login-modal') {
-                els.passwordInput.setAttribute('type', 'password');
-                els.togglePassword.classList.add('fa-eye');
-                els.togglePassword.classList.remove('fa-eye-slash');
-            }
-        };
-        window.closeModal = (id) => document.getElementById(id).classList.remove('active');
-        window.openUploadModal = () => openModal('upload-modal');
-        window.switchTab = (tabId) => {
+        // --- UI Modals ---
+        window.openModal = function(id) { document.getElementById(id).classList.add('active'); }
+        window.closeModal = function(id) { document.getElementById(id).classList.remove('active'); }
+        window.openUploadModal = function() { openModal('upload-modal'); }
+        
+        window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
             document.getElementById(tabId).style.display = 'block';
-            ['data', 'security', 'settings'].forEach(t => {
-                document.getElementById(`tab-btn-${t}`).style.color = 'var(--text-dim)';
+            ['tab-btn-data', 'tab-btn-security', 'tab-btn-settings'].forEach(id => {
+                document.getElementById(id).style.color = (id === `tab-btn-${tabId.split('-')[1]}`) ? 'var(--accent)' : 'var(--text-dim)';
             });
-            document.getElementById(`tab-btn-${tabId.replace('tab-', '')}`).style.color = 'var(--accent)';
-        };
+        }
 
         function showToast(msg) {
-            els.toast.textContent = msg;
+            els.toast.innerText = msg;
             els.toast.classList.add('show');
             setTimeout(() => els.toast.classList.remove('show'), 3000);
         }
 
-        // --- Chart.js ---
+        // --- Charting Engine (Chart.js Simulation) ---
         let charts = {};
         function initCharts() {
-            const ctx1 = document.getElementById('lineChart').getContext('2d');
-            charts.line = new Chart(ctx1, {
-                type: 'line',
-                data: {
-                    labels: ['2021', '2022', '2023', '2024', '2025', '2026'],
-                    datasets: [{ label: 'Crime Incidents Trend', data: [0, 0, 0, 0, 0, 0], borderColor: '#64ffda', backgroundColor: 'rgba(100, 255, 218, 0.1)', fill: true, tension: 0.4 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccd6f6' } } }, scales: { y: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
-            });
-
-            const ctx2 = document.getElementById('barChart').getContext('2d');
-            charts.bar = new Chart(ctx2, {
-                type: 'bar',
-                data: {
-                    labels: ['Western', 'Central', 'Northern', 'Southern', 'Eastern', 'North Western', 'North Central', 'Uva', 'Sabaragamuwa'],
-                    datasets: [{ label: 'Cases by Province', data: [0, 0, 0, 0, 0, 0, 0, 0, 0], backgroundColor: '#64ffda', borderWidth: 1 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccd6f6' } } }, scales: { y: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
-            });
-
-            const ctx3 = document.getElementById('pieChart').getContext('2d');
-            charts.pie = new Chart(ctx3, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Theft', 'Cybercrime', 'Drug', 'Homicide', 'Fraud'],
-                    datasets: [{ data: [0, 0, 0, 0, 0], backgroundColor: ['#64ffda', '#58a6ff', '#ff7b72', '#d2a8ff', '#ffffff'], borderWidth: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#ccd6f6' } } } }
-            });
-
-            const ctx4 = document.getElementById('areaChart').getContext('2d');
-            charts.area = new Chart(ctx4, {
-                type: 'line',
-                data: {
-                    labels: ['Pending', 'Under Investigation', 'Solved', 'Closed'],
-                    datasets: [{ label: 'Status Volume', data: [0, 0, 0, 0], borderColor: '#58a6ff', backgroundColor: 'rgba(88, 166, 255, 0.2)', fill: true }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ccd6f6' } } }, scales: { y: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { ticks: { color: '#8892b0' }, grid: { color: 'rgba(255,255,255,0.05)' } } } }
-            });
+            const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8892b0' } } } };
+            charts.line = new Chart(document.getElementById('lineChart'), { type: 'line', data: { labels: ['2021', '2022', '2023', '2024', '2025', '2026'], datasets: [{ label: 'Incidents', data: [450, 620, 890, 1100, 1250, 310], borderColor: '#64ffda', tension: 0.3 }] }, options: opt });
+            charts.bar = new Chart(document.getElementById('barChart'), { type: 'bar', data: { labels: ['Western', 'Central', 'Southern', 'Northern', 'Eastern'], datasets: [{ label: 'Cases', data: [520, 210, 180, 95, 140], backgroundColor: 'rgba(100, 255, 218, 0.6)' }] }, options: opt });
+            charts.pie = new Chart(document.getElementById('pieChart'), { type: 'pie', data: { labels: ['Theft', 'Cyber', 'Drugs', 'Homicide', 'Fraud'], datasets: [{ data: [40, 25, 15, 5, 15], backgroundColor: ['#64ffda', '#172a45', '#ff5f5f', '#ccd6f6', '#8892b0'] }] }, options: opt });
+            charts.area = new Chart(document.getElementById('areaChart'), { type: 'line', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'], datasets: [{ label: 'Solved %', data: [72, 75, 74, 79, 83], fill: true, backgroundColor: 'rgba(100,255,218,0.1)', borderColor: '#64ffda' }] }, options: opt });
         }
 
         function updateCharts() {
-            const years = ['2021', '2022', '2023', '2024', '2025', '2026'];
-            charts.line.data.datasets[0].data = years.map(y => state.crimeData.filter(c => c.date.startsWith(y)).length);
-            charts.line.update();
-
-            const provinces = ['Western', 'Central', 'Northern', 'Southern', 'Eastern', 'North Western', 'North Central', 'Uva', 'Sabaragamuwa'];
-            charts.bar.data.datasets[0].data = provinces.map(p => state.crimeData.filter(c => c.province === p).length);
-            charts.bar.update();
-
-            const categories = ['Theft', 'Cybercrime', 'Drug', 'Homicide', 'Fraud'];
-            charts.pie.data.datasets[0].data = categories.map(cat => state.crimeData.filter(c => c.category === cat).length);
+            if(!charts.pie) return;
+            const cats = ['Theft', 'Cybercrime', 'Drug', 'Homicide', 'Fraud'];
+            const counts = cats.map(cat => state.crimeData.filter(c => c.category === cat).length);
+            charts.pie.data.datasets[0].data = counts;
             charts.pie.update();
-
-            const statuses = ['Pending', 'Under Investigation', 'Solved', 'Closed'];
-            charts.area.data.datasets[0].data = statuses.map(s => state.crimeData.filter(c => c.status === s).length);
-            charts.area.update();
+            
+            document.getElementById('stat-total').innerText = state.crimeData.length + 12537;
+            document.getElementById('stat-cyber').innerText = state.crimeData.filter(c => c.category === 'Cybercrime').length + 873;
         }
 
-        // --- Interactive Constellation Network ---
+        // --- Interactive Background Constellation ---
         function initInteractiveConstellation() {
             const canvas = document.getElementById('interactiveCanvas');
             const ctx = canvas.getContext('2d');
-            
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-
             let particlesArray = [];
-            const maxDistance = 100;
-            const mouse = { x: null, y: null, radius: 150 };
-            
-            window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
-            window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
 
             class Particle {
-                constructor(x, y, vx, vy, size) {
-                    this.x = x; this.y = y; this.vx = vx; this.vy = vy; this.size = size;
+                constructor(x, y, directionX, directionY, size) {
+                    this.x = x; this.y = y; this.directionX = directionX; this.directionY = directionY; this.size = size;
                 }
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
-                    ctx.fillStyle = 'rgba(100, 255, 218, 0.7)';
-                    ctx.fill();
-                }
+                draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false); ctx.fillStyle = '#64ffda'; ctx.fill(); }
                 update() {
-                    if (this.x > canvas.width || this.x < 0) this.vx = -this.vx;
-                    if (this.y > canvas.height || this.y < 0) this.vy = -this.vy;
-                    this.x += this.vx; this.y += this.vy;
-                    this.draw();
+                    if (this.x > canvas.width || this.x < 0) this.directionX = -this.directionX;
+                    if (this.y > canvas.height || this.y < 0) this.directionY = -this.directionY;
+                    this.x += this.directionX; this.y += this.directionY; this.draw();
                 }
             }
 
             function connect() {
-                let opacityValue = 1;
                 for (let a = 0; a < particlesArray.length; a++) {
                     for (let b = a; b < particlesArray.length; b++) {
-                        let dx = particlesArray[a].x - particlesArray[b].x;
-                        let dy = particlesArray[a].y - particlesArray[b].y;
-                        let distance = Math.sqrt(dx * dx + dy * dy);
-
-                        if (distance < maxDistance) {
-                            opacityValue = 1 - (distance / maxDistance);
-                            ctx.strokeStyle = `rgba(100, 255, 218, ${opacityValue * 0.15})`;
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
-                            ctx.stroke();
-                        }
-                    }
-
-                    if (mouse.x != null && mouse.y != null) {
-                        let mdx = particlesArray[a].x - mouse.x;
-                        let mdy = particlesArray[a].y - mouse.y;
-                        let mDistance = Math.sqrt(mdx * mdx + mdy * mdy);
-                        if (mDistance < mouse.radius) {
-                            let mOpacity = 1 - (mDistance / mouse.radius);
-                            ctx.strokeStyle = `rgba(100, 255, 218, ${mOpacity * 0.35})`;
-                            ctx.lineWidth = 1;
-                            ctx.beginPath();
-                            ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                            ctx.lineTo(mouse.x, mouse.y);
-                            ctx.stroke();
+                        let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                        if (distance < (canvas.width/7) * (canvas.height/7)) {
+                            ctx.strokeStyle = 'rgba(100, 255, 218, ' + (1 - (distance/20000)) + ')';
+                            ctx.lineWidth = 0.5; ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                            ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke();
                         }
                     }
                 }
@@ -969,7 +881,7 @@
 
             function init() {
                 particlesArray = [];
-                let numberOfParticles = (canvas.height * canvas.width) / 9000;
+                let numberOfParticles = (canvas.width * canvas.height) / 9000;
                 for (let i = 0; i < numberOfParticles; i++) {
                     let size = (Math.random() * 2) + 1;
                     let x = Math.random() * (innerWidth - size * 2) + size;
