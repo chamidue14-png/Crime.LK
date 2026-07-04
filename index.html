@@ -532,7 +532,21 @@
 
     <script>
         // --- State Management ---
-        const state = {
+        // Databas Setupe
+const dbName = "CrimeLK_DB";
+let db;
+
+const request = indexedDB.open(dbName, 1);
+request.onupgradeneeded = (e) => {
+    db = e.target.result;
+    if (!db.objectStoreNames.contains("reports")) {
+        db.createObjectStore("reports", { keyPath: "id" });
+    }
+};
+request.onsuccess = (e) => {
+    db = e.target.result;
+    renderPDFs();
+};
             isAuthenticated: false,
             adminPassword: 'password123',
             user: null,
@@ -651,10 +665,44 @@
             }
         };
 
-        window.deletePDF = function(id) {
+        window.function renderPDFs() {
+    if (!db) return;
+    const tx = db.transaction("reports", "readonly");
+    const store = tx.objectStore("reports");
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+        const reports = request.result;
+        els.pdfContainer.innerHTML = '';
+        reports.forEach(pdf => {
+            const li = document.createElement('li');
+            li.className = 'pdf-item';
+            li.innerHTML = `
+                <div style="display:flex; align-items:center; gap: 1rem;">
+                    <i class="fas fa-file-pdf" style="color: var(--danger); font-size: 1.5rem;"></i>
+                    <div>
+                        <h4 style="color: var(--white);">${pdf.title}</h4>
+                        <span style="font-size: 0.8rem; color: var(--text-dim);">${pdf.date} • ${pdf.size}</span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn" style="font-size: 0.8rem;" onclick="downloadPDFFile(${pdf.id})"><i class="fas fa-download"></i></button>
+                    <button class="btn btn-danger" style="display: ${state.isAuthenticated ? 'inline-block' : 'none'}; font-size: 0.8rem; margin-left: 5px;" onclick="deletePDF(${pdf.id})"><i class="fas fa-trash"></i></button>
+                </div>
+            `;
+            els.pdfContainer.appendChild(li);
+        });
+    };
+}
+
+window.deletePDF = function(id) {
+    if (!confirm('Delete this report?')) return;
+    const tx = db.transaction("reports", "readwrite");
+    tx.objectStore("reports").delete(id);
+    tx.oncomplete = () => renderPDFs();
+};= function(id) {
             if (!confirm('Remove this report permanently?')) return;
             state.reports = state.reports.filter(r => r.id !== id);
-            renderPDFs();
             showToast('Report removed successfully');
         };
 
@@ -709,9 +757,34 @@
                 this.classList.toggle('fa-eye');
                 this.classList.toggle('fa-eye-slash');
             });
+document.getElementById('upload-pdf-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = document.getElementById('pdf-title').value;
+    const fileInput = document.getElementById('pdf-file');
+    const file = fileInput.files[0];
+    
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const newReport = {
+            id: Date.now(),
+            title: title,
+            size: (file.size / (1024 * 1024)).toFixed(1) + ' MB',
+            date: new Date().toISOString().split('T')[0],
+            fileData: event.target.result
+        };
 
-            document.getElementById('upload-pdf-form').addEventListener('submit', (e) => {
-                e.preventDefault();
+        const tx = db.transaction("reports", "readwrite");
+        tx.objectStore("reports").add(newReport);
+        tx.oncomplete = () => {
+            renderPDFs();
+            closeModal('upload-modal');
+            showToast('Report Published');
+            document.getElementById('upload-pdf-form').reset();
+        };
+    };
+    reader.readAsDataURL(file);
+});
+           
                 const title = document.getElementById('pdf-title').value;
                 const fileInput = document.getElementById('pdf-file');
                 
