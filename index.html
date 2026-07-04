@@ -1005,46 +1005,110 @@
                 updateCount();
             });
         }
-       <script>
-        // --- අලුතින්ම දාන්න ඕන කොටස ---
-        let db;
-        const dbRequest = indexedDB.open("CrimeLK_DB", 1);
+        <script>
+    let db;
+    const request = indexedDB.open("CrimeLK_DB", 1);
 
-        dbRequest.onupgradeneeded = (e) => {
-            db = e.target.result;
-            if (!db.objectStoreNames.contains('crimes')) db.createObjectStore('crimes', { keyPath: 'id' });
-            if (!db.objectStoreNames.contains('reports')) db.createObjectStore('reports', { keyPath: 'id' });
+    request.onupgradeneeded = (e) => {
+        db = e.target.result;
+        if (!db.objectStoreNames.contains('crimes')) db.createObjectStore('crimes', { keyPath: 'id', autoIncrement: true });
+        if (!db.objectStoreNames.contains('reports')) db.createObjectStore('reports', { keyPath: 'id', autoIncrement: true });
+    };
+
+    request.onsuccess = (e) => {
+        db = e.target.result;
+        loadAllData();
+    };
+
+    function saveToDB(store, data) {
+        const tx = db.transaction(store, 'readwrite');
+        tx.objectStore(store).add(data);
+        tx.oncomplete = () => loadAllData();
+    }
+
+    function loadAllData() {
+        const tx = db.transaction(['crimes', 'reports'], 'readonly');
+        tx.objectStore('crimes').getAll().onsuccess = (e) => {
+            if(e.target.result.length > 0) {
+                state.crimeData = e.target.result;
+                renderTable(state.crimeData);
+            }
         };
-
-        dbRequest.onsuccess = (e) => {
-            db = e.target.result;
-            loadDataFromDB(); 
+        tx.objectStore('reports').getAll().onsuccess = (e) => {
+            if(e.target.result.length > 0) {
+                state.reports = e.target.result;
+                renderPDFs();
+            }
         };
-        // ---------------------------------
+    }
 
-        // --- දැනට තියෙන state එක ---
-        const state = { ... }; // --- දත්ත ස්ථිරව සේව් කරන්න සහ ගන්න Function ටික ---
-        function saveToDB(storeName, data) {
-            const tx = db.transaction(storeName, 'readwrite');
-            tx.objectStore(storeName).put(data);
-            tx.oncomplete = () => loadDataFromDB();
-        }
+    const state = { 
+        isAuthenticated: false, 
+        adminPassword: 'password123', 
+        user: null, 
+        crimeData: [], 
+        reports: [] 
+    };
 
-        function loadDataFromDB() {
-            const tx = db.transaction(['crimes', 'reports'], 'readonly');
-            tx.objectStore('crimes').getAll().onsuccess = (e) => {
-                if(e.target.result.length > 0) {
-                    state.crimeData = e.target.result;
-                    renderTable(state.crimeData);
-                }
+    // --- Table Rendering (Database eken data gannawa) ---
+    function renderTable(data) {
+        const tbody = document.querySelector('#crime-table tbody');
+        tbody.innerHTML = '';
+        data.forEach(item => {
+            tbody.innerHTML += `
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.date}</td>
+                    <td>${item.province}</td>
+                    <td>${item.district}</td>
+                    <td>${item.category}</td>
+                    <td>${item.status}</td>
+                    <td class="admin-only-col" style="display: ${state.isAuthenticated ? 'table-cell' : 'none'};">
+                        <button class="btn btn-danger" onclick="deleteCrime(${item.id})">Delete</button>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    // --- PDF Rendering ---
+    function renderPDFs() {
+        const list = document.getElementById('pdf-container');
+        list.innerHTML = '';
+        state.reports.forEach(pdf => {
+            list.innerHTML += `
+                <li class="pdf-item">
+                    <span>${pdf.title}</span>
+                    <button class="btn" onclick="window.open('${pdf.fileData}')">View</button>
+                </li>`;
+        });
+    }
+
+    // --- Events (Buttons and Forms) ---
+    function setupEventListeners() {
+        // Crime form eka save karanna
+        document.getElementById('add-crime-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const newCrime = {
+                id: Date.now(), // Unique ID
+                date: document.getElementById('new-date').value,
+                province: document.getElementById('new-province').value,
+                category: document.getElementById('new-category').value,
+                district: document.getElementById('new-district').value,
+                status: 'Pending'
             };
-            tx.objectStore('reports').getAll().onsuccess = (e) => {
-                if(e.target.result.length > 0) {
-                    state.reports = e.target.result;
-                    renderPDFs();
-                }
-            };
-        }
+            
+           // Database ekata daanna
+            saveTo DB('crimes', newCrime);
+            alert('Crime record added!');
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            state.isAuthenticated = false;
+            location.reload(); // Page eka refresh karala admin access ain karanna
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', setupEventListeners);
     </script>
 </body>
 </html>
