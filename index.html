@@ -399,11 +399,34 @@
         </div>
     </section>
 
-    <footer style="background: #020c1b; padding: 2rem; text-align: center; color: var(--text-dim); border-top: var(--border);">
-        <p>&copy; 2026 NEW Crime.LK. National Crime Research Platform. All Rights Reserved. | Created by Chamidu Eranga Deshan</p>
-    </footer>
+   // --- PDF Rendering & Download Logic ---
+        function renderPDFs() {
+            els.pdfContainer.innerHTML = '';
+            state.reports.forEach(pdf => {
+                const li = document.createElement('li');
+                li.className = 'pdf-item';
+                
+                // පරිපාලකයා නම් පමණක් 'Remove' බොත්තම පෙන්වීමට මෙම කොන්දේසිය භාවිතා වේ
+                const adminDeleteBtn = state.isAuthenticated ? 
+                    `<button class="btn btn-danger admin-only-del" style="font-size: 0.8rem; margin-left: 5px;" onclick="deletePDF(${pdf.id})"><i class="fas fa-trash"></i> Remove</button>` 
+                    : '';
 
-    <div class="modal" id="login-modal">
+                li.innerHTML = `
+                    <div style="display:flex; align-items:center; gap: 1rem;">
+                        <i class="fas fa-file-pdf" style="color: var(--danger); font-size: 1.5rem;"></i>
+                        <div>
+                            <h4 style="color: var(--white);">${pdf.title}</h4>
+                            <span style="font-size: 0.8rem; color: var(--text-dim);">${pdf.date} • ${pdf.size}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn" style="font-size: 0.8rem;" onclick="downloadPDFFile(${pdf.id})"><i class="fas fa-download"></i> Download</button>
+                        ${adminDeleteBtn}
+                    </div>
+                `;
+                els.pdfContainer.appendChild(li);
+            });
+        }
         <div class="modal-content">
             <span class="close-modal" onclick="closeModal('login-modal')">&times;</span>
             <h2 style="margin-bottom: 1.5rem; color: var(--white); text-align: center;">Secure Admin Login</h2>
