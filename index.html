@@ -995,6 +995,44 @@ window.downloadPDFFile = function(id) {
     link.download = `${report.title}.pdf`;
     link.click();
 };
+        // 1. PDF එකක් අප්ලෝඩ් කරද්දී (File input එකෙන්)
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const fileData = {
+            name: file.name,
+            type: file.type,
+            data: e.target.result, // මේක තමයි PDF එකේ binary data එක
+            timestamp: new Date().getTime()
+        };
+
+        // IndexedDB එකට දාන්න
+        const tx = db.transaction('reports', 'readwrite');
+        tx.objectStore('reports').add(fileData);
+        tx.oncomplete = () => {
+            alert("PDF එක සාර්ථකව ස්ථිරවම සේව් වුණා!");
+            loadAllData(); // ආයේ පාරක් දත්ත ලෝඩ් කරන්න
+        };
+    };
+    reader.readAsDataURL(file); // PDF එක URL එකක් විදියට හදනවා
+}
+
+// 2. සේව් වෙලා තියෙන PDF එක පෙන්වද්දී
+function renderPDFs() {
+    const reportList = document.querySelector('#report-list'); // ඔයාගේ HTML එකේ ID එක
+    reportList.innerHTML = '';
+
+    state.reports.forEach(report => {
+        reportList.innerHTML += `
+            <div>
+                <p>${report.name}</p>
+                <a href="${report.data}" download="${report.name}">Download PDF</a>
+            </div>
+        `;
+    });
+}
     </script>
 </body>
 </html>
