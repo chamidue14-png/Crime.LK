@@ -532,21 +532,7 @@
 
     <script>
         // --- State Management ---
-        // Database Setup
-const dbName = "CrimeLK_DB";
-let db;
-
-const request = indexedDB.open(dbName, 1);
-request.onupgradeneeded = (e) => {
-    db = e.target.result;
-    if (!db.objectStoreNames.contains("reports")) {
-        db.createObjectStore("reports", { keyPath: "id" });
-    }
-};
-request.onsuccess = (e) => {
-    db = e.target.result;
-    renderPDFs();
-};
+        const state = {
             isAuthenticated: false,
             adminPassword: 'password123',
             user: null,
@@ -665,7 +651,7 @@ request.onsuccess = (e) => {
             }
         };
 
-        window. = function(id) {
+        window.deletePDF = function(id) {
             if (!confirm('Remove this report permanently?')) return;
             state.reports = state.reports.filter(r => r.id !== id);
             renderPDFs();
@@ -725,32 +711,7 @@ request.onsuccess = (e) => {
             });
 
             document.getElementById('upload-pdf-form').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const title = document.getElementById('pdf-title').value;
-    const fileInput = document.getElementById('pdf-file');
-    const file = fileInput.files[0];
-    
-    const reader = new FileReader();
-    reader.onload = function(event) {
-        const newReport = {
-            id: Date.now(),
-            title: title,
-            size: (file.size / (1024 * 1024)).toFixed(1) + ' MB',
-            date: new Date().toISOString().split('T')[0],
-            fileData: event.target.result
-        };
-
-        const tx = db.transaction("reports", "readwrite");
-        tx.objectStore("reports").add(newReport);
-        tx.oncomplete = () => {
-            renderPDFs();
-            closeModal('upload-modal');
-            showToast('Report Published');
-            document.getElementById('upload-pdf-form').reset();
-        };
-    };
-    reader.readAsDataURL(file);
-});
+                e.preventDefault();
                 const title = document.getElementById('pdf-title').value;
                 const fileInput = document.getElementById('pdf-file');
                 
