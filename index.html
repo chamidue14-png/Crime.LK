@@ -3,17 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- Google Search SEO ටැග්ස් -->
     <title>Crime.LK - National Crime Research Platform Sri Lanka</title>
     <meta name="description" content="NEW Crime.LK is the National Crime Research Platform for Sri Lanka, transforming crime statistics into meaningful research insights.">
     <meta name="keywords" content="Crime.LK, Crime LK, Sri Lanka Crime Research, Crime Data Sri Lanka, Chamidu Eranga Deshan">
     <meta name="author" content="Chamidu Eranga Deshan">
     <meta name="robots" content="index, follow">
-    
+
     <!-- නිවැරදි Canonical URL එක මෙන්න මචන් -->
     <link rel="canonical" href="https://chamidue14-png.github.io/Crime.LK/">
-    
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -84,7 +84,7 @@
             transition: color 0.3s;
         }
         .nav-links a:hover, .nav-links a.active { color: var(--accent); }
-        
+
         /* --- Buttons --- */
         .btn {
             padding: 0.6rem 1.5rem;
@@ -103,7 +103,7 @@
         .btn-primary:hover { background: #4cd6b3; }
         .btn-danger { border-color: var(--danger); color: var(--danger); }
         .btn-danger:hover { background: rgba(255, 95, 95, 0.1); }
-        
+
         /* --- Admin Controls --- */
         .admin-controls {
             display: none;
@@ -123,12 +123,12 @@
         /* --- Layout --- */
         section { padding: 6rem 5% 4rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; }
         .container { max-width: 1200px; margin: 0 auto; width: 100%; }
-        
+
         /* --- Hero --- */
         #home { align-items: flex-start; text-align: left; }
         .hero-title { font-size: 3.5rem; color: var(--white); margin-bottom: 1rem; animation: fadeIn 1s ease-out; }
         .hero-subtitle { font-size: 1.2rem; color: var(--text-dim); max-width: 600px; margin-bottom: 2rem; animation: fadeIn 1.2s ease-out; }
-        
+
         /* --- Stats Cards --- */
         .stats-grid {
             display: grid;
@@ -267,12 +267,33 @@
         }
         #toast.show { transform: translateY(0); }
 
+        /* PDF Section Styles */
+        .pdf-badge {
+            background: rgba(100, 255, 218, 0.1);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+        }
+        .pdf-empty {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-dim);
+        }
+        .pdf-empty i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-dim);
+        }
+
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .hero-title { font-size: 2.5rem; }
             .charts-grid { grid-template-columns: 1fr; }
         }
     </style>
+<base target="_blank">
 </head>
 <body>
 
@@ -286,7 +307,7 @@
             <li><a href="#stats">Statistics</a></li>
             <li><a href="#reports">Reports</a></li>
         </ul>
-        
+
         <div style="display: flex; gap: 1rem; align-items: center;">
             <button id="btn-admin-login" class="btn" style="display: none;">Admin</button>
             <div id="admin-controls" class="admin-controls">
@@ -425,7 +446,7 @@
         <div class="modal-content" style="max-width: 800px;">
             <span class="close-modal" onclick="closeModal('dashboard-modal')">&times;</span>
             <h2 style="color: var(--white); margin-bottom: 1rem;"><i class="fas fa-user-cog" style="color: var(--accent);"></i> Admin Dashboard</h2>
-            
+
             <div style="display: flex; gap: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem;">
                 <button class="btn" onclick="switchTab('tab-data')" id="tab-btn-data" style="border:none; color:var(--accent);">
                     <i class="fas fa-database"></i> Data Mgmt
@@ -470,7 +491,7 @@
 
             <div id="tab-security" class="tab-content" style="display:none;">
                 <h3 style="color: var(--accent); margin-bottom: 1rem;"><i class="fas fa-lock"></i> Security Center</h3>
-                
+
                 <div class="security-card">
                     <div class="security-item">
                         <span><i class="fas fa-key" style="color: var(--accent); width:20px;"></i> 2-Factor Authentication:</span>
@@ -523,7 +544,7 @@
                     <label>PDF File</label>
                     <input type="file" id="pdf-file" accept=".pdf" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-publish"></i> Upload & Publish</button>
+                <button type="submit" class="btn btn-primary" style="width: 100%;"><i class="fas fa-upload"></i> Upload & Publish</button>
             </form>
         </div>
     </div>
@@ -531,23 +552,59 @@
     <div id="toast">Operation Successful</div>
 
     <script>
+        // ============================================================
+        //  LOCALSTORAGE PDF MANAGER - ප්‍රධාන සංස්කරණය
+        // ============================================================
+        // මෙය PDF දත්ත localStorage තුළ සුරකින අතර, පිටුව රීෆ්‍රෙෂ් වූවත්
+        // ඒවා මැකී නොයයි. සියලුම පරිශීලකයන්ට PDF දර්ශනය වේ.
+        // ============================================================
+
+        const STORAGE_KEYS = {
+            REPORTS: 'crimelk_reports',
+            ADMIN_PASS: 'crimelk_admin_pass',
+            CRIME_DATA: 'crimelk_crime_data'
+        };
+
+        // --- localStorage Helper Functions ---
+        function saveToStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                return true;
+            } catch (e) {
+                console.error('Storage save error:', e);
+                showToast('Storage full! Cannot save more files.');
+                return false;
+            }
+        }
+
+        function loadFromStorage(key, defaultValue = null) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (e) {
+                console.error('Storage load error:', e);
+                return defaultValue;
+            }
+        }
+
         // --- State Management ---
         const state = {
             isAuthenticated: false,
-            adminPassword: 'password123',
+            adminPassword: loadFromStorage(STORAGE_KEYS.ADMIN_PASS, 'password123'),
             user: null,
-            crimeData: [
+            crimeData: loadFromStorage(STORAGE_KEYS.CRIME_DATA, [
                 { id: 101, date: '2023-05-12', province: 'Western', district: 'Colombo', category: 'Theft', description: 'Vehicle theft in Nugegoda', status: 'Under Investigation' },
                 { id: 102, date: '2023-06-01', province: 'Central', district: 'Kandy', category: 'Fraud', description: 'Online banking scam', status: 'Closed' },
                 { id: 103, date: '2023-07-20', province: 'Northern', district: 'Jaffna', category: 'Cybercrime', description: 'Social media harassment', status: 'Pending' },
                 { id: 104, date: '2024-08-15', province: 'Southern', district: 'Galle', category: 'Drug', description: 'Possession of narcotics', status: 'Solved' },
                 { id: 105, date: '2025-09-10', province: 'Western', district: 'Colombo', category: 'Homicide', description: 'Gang related violence', status: 'Under Investigation' },
                 { id: 106, date: '2026-02-14', province: 'Eastern', district: 'Batticaloa', category: 'Theft', description: 'House breaking', status: 'Closed' },
-            ],
-            reports: [
-                { id: 1, title: 'Annual Crime Report 2022', size: '2.4 MB', date: '2023-01-15', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUIgplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA1CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxOCAwMDAwMCBuIAowMDAwMDAwMDY5IDAwMDAwIG4gCjAwMDAwMDAxZEEgMDAwMDAgbYgKM0AwMDAwMDAxOTYgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA1Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgogMzAxCiUlRU9G' },
-                { id: 2, title: 'Cybercrime Trends in Sri Lanka', size: '1.8 MB', date: '2023-03-10', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUIgplbmRzdHJlYW0KZW5kb2JqCnhyZWYKMCA1CjAwMDAwMDAwMDAgNjU1MzUgZiAKMDAwMDAwMDAxOCAwMDAwMCBuIAowMDAwMDAwMDY5IDAwMDAwIG4gCjAwMDAwMDAxZEEgMDAwMDAgbYgKM0AwMDAwMDAxOTYgMDAwMDAgbiAKdHJhaWxlcgo8PAovU2l6ZSA1Ci9Sb290IDEgMCBSCj4+CnN0YXJ0eHJlZgogMzAxCiUlRU9G' }
-            ]
+            ]),
+            // PDF reports load from localStorage (ප්‍රධාන සංස්කරණය!)
+            reports: loadFromStorage(STORAGE_KEYS.REPORTS, [
+                { id: 1, title: 'Annual Crime Report 2022', size: '2.4 MB', date: '2023-01-15', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDUKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE4IDAwMDAwIG4gCjAwMDAwMDAwNjkgMDAwMDAgbiAKMDAwMDAwMDE0MCA2NTUzNSBmIAowMDAwMDAwMTk2IDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgNQovUm9vdCAxIDAgUgo+PgpzdGFydHhyZWYKMzAxCiUlRU9G' },
+                { id: 2, title: 'Cybercrime Trends in Sri Lanka', size: '1.8 MB', date: '2023-03-10', fileData: 'data:application/pdf;base64,JVBERi0xLjQKMSAwIG9iago8PAovVHlwZSAvQ2F0YWxvZwovUGFnZXMgMiAwIFIKPj4KZW5kb2JqCjIgMCBvYmoKPDwKL1R5cGUgL1BhZ2VzCi9LaWRzIFszIDAgUl0KL0NvdW50IDEKPj4KZW5kb2JqCjMgMCBvYmoKPDwKL1R5cGUgL1BhZ2UKL1BhcmVudCAyIDAgUgovTWVkaWFCb3ggWzAgMCA1OTUgODQyXQovQ29udGVudHMgNCAwIFIKPj4KZW5kb2JqCjQgMCBvYmoKPDwKL0xlbmd0aCA1Ngo+PgpzdHJlYW0KQlQgL0YxIDEyIFRmIDcwIDcwMCBUZCAoQ3JpbWUuTEsgRG93bmxvYWQgVGVzdCBQREYpIFRqIEVUCmVuZHN0cmVhbQplbmRvYmoKeHJlZgowIDUKMDAwMDAwMDAwMCA2NTUzNSBmIAowMDAwMDAwMDE4IDAwMDAwIG4gCjAwMDAwMDAwNjkgMDAwMDAgbiAKMDAwMDAwMDE0MCA2NTUzNSBmIAowMDAwMDAwMTk2IDAwMDAwIG4gCnRyYWlsZXIKPDwKL1NpemUgNQovUm9vdCAxIDAgUgo+PgpzdGFydHhyZWYKMzAxCiUlRU9G' }
+            ])
         };
 
         // --- DOM Elements ---
@@ -614,8 +671,21 @@
         }
 
         // --- PDF Rendering & Download Logic ---
+        // ප්‍රධාන සංස්කරණය: PDF localStorage තුළ සුරකින අතර, සියලු පරිශීලකයන්ට දර්ශනය වේ
         function renderPDFs() {
             els.pdfContainer.innerHTML = '';
+
+            if (state.reports.length === 0) {
+                els.pdfContainer.innerHTML = `
+                    <div class="pdf-empty">
+                        <i class="fas fa-folder-open"></i>
+                        <p>No research reports available yet.</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Admin can upload PDF reports using the Upload button above.</p>
+                    </div>
+                `;
+                return;
+            }
+
             state.reports.forEach(pdf => {
                 const li = document.createElement('li');
                 li.className = 'pdf-item';
@@ -623,7 +693,7 @@
                     <div style="display:flex; align-items:center; gap: 1rem;">
                         <i class="fas fa-file-pdf" style="color: var(--danger); font-size: 1.5rem;"></i>
                         <div>
-                            <h4 style="color: var(--white);">${pdf.title}</h4>
+                            <h4 style="color: var(--white);">${pdf.title} <span class="pdf-badge">PDF</span></h4>
                             <span style="font-size: 0.8rem; color: var(--text-dim);">${pdf.date} • ${pdf.size}</span>
                         </div>
                     </div>
@@ -654,6 +724,8 @@
         window.deletePDF = function(id) {
             if (!confirm('Remove this report permanently?')) return;
             state.reports = state.reports.filter(r => r.id !== id);
+            // localStorage තුළ සුරකිනවා (ප්‍රධාන සංස්කරණය!)
+            saveToStorage(STORAGE_KEYS.REPORTS, state.reports);
             renderPDFs();
             showToast('Report removed successfully');
         };
@@ -668,6 +740,8 @@
             const newPass = prompt("Enter new Administrator password:");
             if(newPass && newPass.trim().length > 4) {
                 state.adminPassword = newPass.trim();
+                // localStorage තුළ password සුරකිනවා
+                saveToStorage(STORAGE_KEYS.ADMIN_PASS, state.adminPassword);
                 showToast("Admin password changed successfully!");
             } else if(newPass) {
                 showToast("Password too short! Must be at least 5 characters.");
@@ -681,7 +755,7 @@
             dlAnchor.setAttribute("download", "crimelk_db_backup.json");
             document.body.appendChild(dlAnchor);
             dlAnchor.click();
-            dlAnchor.removeChild();
+            dlAnchor.remove();
             showToast("Database JSON backup downloaded!");
         }
 
@@ -697,7 +771,7 @@
             els.adminLoginBtn.addEventListener('click', () => openModal('login-modal'));
             els.dashboardBtn.addEventListener('click', () => openModal('dashboard-modal'));
             els.logoutBtn.addEventListener('click', logout);
-            
+
             els.loginForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 login(document.getElementById('username').value, document.getElementById('password').value);
@@ -714,31 +788,44 @@
                 e.preventDefault();
                 const title = document.getElementById('pdf-title').value;
                 const fileInput = document.getElementById('pdf-file');
-                
+
                 if(fileInput.files.length === 0) {
                     showToast("Please select a PDF file first.");
                     return;
                 }
 
                 const file = fileInput.files[0];
+
+                // File size check (max 5MB for localStorage)
+                if (file.size > 5 * 1024 * 1024) {
+                    showToast("File too large! Max 5MB for browser storage.");
+                    return;
+                }
+
                 const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1) + ' MB';
-                
+
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    state.reports.push({
+                    const newReport = {
                         id: Date.now(),
                         title: title,
                         size: fileSizeMB,
                         date: new Date().toISOString().split('T')[0],
                         fileData: event.target.result
-                    });
-                    
-                    renderPDFs();
-                    closeModal('upload-modal');
-                    showToast('Research Paper published and downloadable!');
-                    document.getElementById('upload-pdf-form').reset();
+                    };
+
+                    state.reports.push(newReport);
+                    // ප්‍රධාන සංස්කරණය: localStorage තුළ PDF සුරකිනවා
+                    const saved = saveToStorage(STORAGE_KEYS.REPORTS, state.reports);
+
+                    if (saved) {
+                        renderPDFs();
+                        closeModal('upload-modal');
+                        showToast('Research Paper published and downloadable!');
+                        document.getElementById('upload-pdf-form').reset();
+                    }
                 };
-                
+
                 reader.readAsDataURL(file);
             });
 
@@ -754,6 +841,8 @@
                     status: 'Pending'
                 };
                 state.crimeData.push(newRecord);
+                // Crime dataත් localStorage තුළ සුරකිනවා
+                saveToStorage(STORAGE_KEYS.CRIME_DATA, state.crimeData);
                 renderTable(state.crimeData);
                 updateCharts();
                 closeModal('dashboard-modal');
@@ -789,6 +878,8 @@
         window.deleteCrime = function(id) {
             if (!confirm('Are you sure you want to delete this record?')) return;
             state.crimeData = state.crimeData.filter(c => c.id !== id);
+            // localStorage update
+            saveToStorage(STORAGE_KEYS.CRIME_DATA, state.crimeData);
             renderTable(state.crimeData);
             updateCharts(); 
             showToast('Record deleted');
@@ -902,14 +993,14 @@
         function initInteractiveConstellation() {
             const canvas = document.getElementById('interactiveCanvas');
             const ctx = canvas.getContext('2d');
-            
+
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
 
             let particlesArray = [];
             const maxDistance = 100;
             const mouse = { x: null, y: null, radius: 150 };
-            
+
             window.addEventListener('mousemove', (event) => { mouse.x = event.x; mouse.y = event.y; });
             window.addEventListener('mouseout', () => { mouse.x = null; mouse.y = null; });
 
