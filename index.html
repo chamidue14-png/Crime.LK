@@ -917,6 +917,84 @@
                 updateCount();
             });
         }
+        // --- IndexedDB Configuration ---
+const DB_NAME = 'CrimeLKDB';
+const DB_VERSION = 1;
+let db;
+
+const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+request.onupgradeneeded = (event) => {
+    db = event.target.result;
+    if (!db.objectStoreNames.contains('crimes')) {
+        db.createObjectStore('crimes', { keyPath: 'id', autoIncrement: true });
+    }
+    if (!db.objectStoreNames.contains('reports')) {
+        db.createObjectStore('reports', { keyPath: 'id', autoIncrement: true });
+    }
+};
+
+request.onsuccess = (event) => {
+    db = event.target.result;
+    loadDataFromDB(); // පේජ් එක ලෝඩ් වෙද්දිම දත්ත ගන්නවා
+};
+
+// --- Data Management Functions ---
+function saveToDB(storeName, data) {
+    const transaction = db.transaction([storeName], 'readwrite');
+    const store = transaction.objectStore(storeName);
+    store.add(data);
+    transaction.oncomplete = () => loadDataFromDB();
+}
+
+function loadDataFromDB() {
+    const transaction = db.transaction(['crimes', 'reports'], 'readonly');
+    
+    // Crimes Load
+    const crimeStore = transaction.objectStore('crimes');
+    crimeStore.getAll().onsuccess = (event) => {
+        const storedCrimes = event.target.result;
+        if(storedCrimes.length > 0) state.crimeData = storedCrimes;
+        renderTable(state.crimeData);
+    };
+
+    // Reports Load
+    const reportStore = transaction.objectStore('reports');
+    reportStore.getAll().onsuccess = (event) => {
+        const storedReports = event.target.result;
+        if(storedReports.length > 0) state.reports = storedReports;
+        renderPDFs();
+    };
+}
+
+// --- PDF Upload & Download Logic ---
+// PDF එක upload කරන තැනට මේක දාන්න:
+document.getElementById('upload-pdf-form').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById('pdf-file');
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        const newReport = {
+            title: document.getElementById('pdf-title').value,
+            date: new Date().toISOString().split('T')[0],
+            size: (fileInput.files[0].size / 1024 / 1024).toFixed(1) + ' MB',
+            fileData: event.target.result
+        };
+        saveToDB('reports', newReport); // මෙතනින් Database එකට යනවා
+        closeModal('upload-modal');
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+});
+
+// Download කරද්දි අනිවාර්යෙන්ම state එකේ තියෙන data ලින්ක් කරන්න
+window.downloadPDFFile = function(id) {
+    const report = state.reports.find(r => r.id === id);
+    const link = document.createElement('a');
+    link.href = report.fileData;
+    link.download = `${report.title}.pdf`;
+    link.click();
+};
     </script>
 </body>
 </html>
